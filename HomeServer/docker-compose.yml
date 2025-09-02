@@ -1,0 +1,98 @@
+services:
+  traefik:
+    image: traefik:v3.5
+    networks:
+      - homeserver-network
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=true"
+      - "--entrypoints.web.address=:80"
+      - "--providers.docker.useBindPortIP=true"
+      - "--log.level=DEBUG"
+      
+      - "traefik.http.middlewares.secure-headers.headers.sslredirect=true"
+      - "traefik.http.middlewares.secure-headers.headers.browserxssfilter=true"
+      - "traefik.http.middlewares.secure-headers.headers.contenttypenosniff=true"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./certs:/certs:ro
+      - ./dynamic:/etc/traefik/dynamic:ro
+
+  # MARK: API
+  homeserver-api:
+    image: homeserver-api 
+    networks:
+      - homeserver-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.homeserver-api.rule=PathPrefix(`/api`)"
+      - "traefik.http.routers.homeserver-api.entrypoints=web"
+      - "traefik.http.services.homeserver-api.loadbalancer.server.port=8080"
+      - "traefik.http.routers.homeserver-api.middlewares=api-strip"
+      - "traefik.http.middlewares.api-strip.stripprefix.prefixes=/api"
+      
+      - "traefik.http.middlewares.secure-headers.headers.sslredirect=true"
+      - "traefik.http.middlewares.secure-headers.headers.browserxssfilter=true"
+      - "traefik.http.middlewares.secure-headers.headers.contenttypenosniff=true"
+
+      # # IP Allowlist Middleware
+      # - "traefik.http.middlewares.ip-allowlist.ipallowlist.sourceRange=127.0.0.1/32,192.168.0.0/16,10.0.0.0/8"
+      # - "traefik.http.routers.homeserver-api.middlewares=secure-headers,ip-allowlist"
+    ports:
+      - "5050:8080"
+    build:
+      context: .
+      dockerfile: ./HomeServer.TodoList/Dockerfile
+      args:
+        configuration: Debug
+    volumes:
+      - "./HomeServer.Data/TodoDatabase:/data"
+
+  homeserver-webui:
+    image: homeserver-webui
+    networks:
+      - homeserver-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.homeserver-webui.rule=PathPrefix(`/home`)"
+      - "traefik.http.routers.homeserver-webui.entrypoints=web"
+      - "traefik.http.services.homeserver-webui.loadbalancer.server.port=80"
+      - "traefik.http.routers.homeserver-webui.middlewares=webui-strip"
+      - "traefik.http.middlewares.webui-strip.stripprefix.prefixes=/home"
+      
+      - "traefik.http.middlewares.secure-headers.headers.sslredirect=true"
+      - "traefik.http.middlewares.secure-headers.headers.browserxssfilter=true"
+      - "traefik.http.middlewares.secure-headers.headers.contenttypenosniff=true"
+    build:
+      context: .
+      dockerfile: ./HomeServer.WebUi/Dockerfile
+      args:
+        configuration: Debug
+    environment:
+      ASPNETCORE_URLS: "http://+:80"
+
+networks:
+  homeserver-network:
+    external: false
+
+    
+  # MARK: Qdrant
+  # homeserver-qdrant:
+  #   image: qdrant/qdrant
+  #   ports:
+  #     - 6333:6333
+  #     - 6334:6334
+
+  # MARK: Aspire
+  # homeserver-aspire:
+  #   image: mcr.microsoft.com/dotnet/aspire-dashboard:latest
+  #   ports:
+  #     - 18888:18888
+
+# volumes:
+#   mongo-data:

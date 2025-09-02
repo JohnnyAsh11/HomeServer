@@ -1,0 +1,206 @@
+﻿@page "/"
+@inject TodoListClient Client;
+@inject IDialogService DialogService;
+@inject ISnackbar Snackbar; 
+@inject ILogger<TaskTracker> Logger;
+
+<PageTitle>Task Tracker</PageTitle>
+
+<MudGrid>
+
+    <MudItem xs="10">
+        <MudText
+            style="margin: 30px; font-size: 2rem;"
+            Class="pa-4">
+            Johnny's Task Tracker
+        </MudText>
+    </MudItem>
+
+    <MudItem xs="2">
+        <MudButton 
+            style="margin: 30px;"
+            Variant="Variant.Filled"
+            Class="pa-4"
+            StartIcon="@Icons.Material.Rounded.Add"
+            OnClick="@CreateNewTask"
+            Color="Color.Primary">
+            Create New Task
+        </MudButton>
+    </MudItem>
+
+    <MudItem xs="12">
+        <MudDataGrid T="TaskModel" Items="_tasks" Loading="false">
+            <Columns>
+                <PropertyColumn Property="x => x.Id" Title="Id" HeaderStyle="width:25px"/>
+                <PropertyColumn Property="x => x.Title" Title="Title" HeaderStyle="width:200px"/>
+                <PropertyColumn Property="x => x.Description" Title="Description" HeaderStyle="width:400px"/>
+                <PropertyColumn Property="x => x.DueDate" Title="Due Date" HeaderStyle="width:100px"/>
+                <PropertyColumn Property="x => x.EstTime" Title="Estimated Time In Hours" HeaderStyle="width:100px"/>
+                <PropertyColumn Property="x => x.IsComplete" Title="Status" HeaderStyle="width:50px">
+                    <CellTemplate>
+                        @if (context.Item.IsComplete)
+                        {
+                            <MudIcon Icon="@Icons.Material.Rounded.CheckCircleOutline" Color="Color.Success"/>
+                        }
+                        else
+                        {
+                            <MudIcon Icon="@Icons.Material.Rounded.FlagCircle" Color="Color.Info"/>
+                        }
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.IsComplete" Title="Completion" HeaderStyle="width:100px">
+                    <CellTemplate>
+                        @if (!context.Item.IsComplete)
+                        {
+                            <MudButton
+                                Variant="Variant.Outlined"
+                                Color="Color.Success"
+                                OnClick="() => AlterCompletion(context.Item.Id, true)">
+                                Mark Complete
+                            </MudButton>
+                        }
+                        else
+                        {
+                            <MudButton
+                                Variant="Variant.Outlined"
+                                Color="Color.Info"
+                                OnClick="() => AlterCompletion(context.Item.Id, false)">
+                                Mark Incomplete
+                            </MudButton>
+                        }
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.IsComplete" Title="" HeaderStyle="width:50px">
+                    <CellTemplate>
+                        <MudIconButton
+                            Icon="@Icons.Material.Filled.Delete"
+                            Variant="Variant.Outlined"
+                            Color="Color.Error"
+                            OnClick="() => DeleteTask(context.Item.Id)">
+                            Mark Complete
+                        </MudIconButton>
+                    </CellTemplate>
+                </PropertyColumn>
+            </Columns>
+        </MudDataGrid>
+    </MudItem>
+
+</MudGrid>
+
+@code{
+    public record TaskModel(
+        int Id, 
+        string Title, 
+        string Description, 
+        float EstTime, 
+        DateTime DueDate, 
+        bool IsComplete);
+    private IEnumerable<TaskModel> _tasks = [];
+
+    /// <inheritdoc/>
+    protected override async Task OnInitializedAsync()
+    {
+        await ReloadDataAsync();
+    }
+
+    private async Task ReloadDataAsync()
+    {
+        // Getting all of the tasks.
+        ICollection<TaskInfoDto> taskData = await Client.TodoList.GetTasksAsync();
+
+        // Converting them to the view model.
+        _tasks = taskData.Select(task => ToViewModel(task));
+    }
+
+    public TaskModel ToViewModel(TaskInfoDto dto)
+    {
+        return new TaskModel(
+            dto.Id!.Value,
+            dto.Title!,
+            dto.Description!,
+            dto.EstimatedTime!.Value,
+            DateTime.Parse(dto.DueDate!),
+            dto.IsComplete!.Value
+        );
+    }
+
+    /// <summary>
+    /// Creates a new task for to be tracked.
+    /// </summary>
+    private async Task CreateNewTask()
+    {
+        DialogOptions options = new DialogOptions { CloseOnEscapeKey = true, CloseButton = false };
+        IDialogReference dialog = await DialogService.ShowAsync<TaskCreationDialog>("Create Task", options);
+
+        DialogResult? result = await dialog.Result;
+
+        if (result is null || result.Data is null)
+        {
+            Snackbar.Add("Something unexpected ocurred while creating your task.", Severity.Error);
+            return;
+        }
+
+        // If this enum was returned then it was cancelled.
+        if (result.Data is DialogResultValue)
+        {
+            Snackbar.Add("Cancelled creation of the task.", Severity.Warning);
+            return;
+        }
+
+        if (result.Data is TaskCreationDialogResult task)
+        {
+            PostTaskInfoDto dto = new()
+            {
+                Title = task.Title, 
+                Description = task.Description,
+                DueDate = task.DueDate.ToString(),
+                EstimatedTime = task.EstimatedTime,
+                IsComplete = false
+            };
+
+            try 
+            {
+                await Client.TodoList.PostTaskAsync(dto);
+            }
+            catch (Exception error)
+            {
+                Logger.LogInformation("HTTP Response message: {message}", error.Message);
+            }
+            Snackbar.Add("Created new task.", Severity.Success);
+            await ReloadDataAsync();
+        }
+    }
+
+    private async Task AlterCompletion(int id, bool isComplete)
+    {
+        PutTaskInfoDto dto = new()
+        {
+            IsComplete = isComplete
+        };
+
+        try 
+        {
+            await Client.TodoList.PutTaskByIdAsync(id, dto);
+        }
+        catch (Exception error)
+        {
+            Logger.LogInformation("HTTP Response message: {message}", error.Message);
+        }
+
+        await ReloadDataAsync();
+    }
+
+    private async Task DeleteTask(int id)
+    {
+        try 
+        {
+            await Client.TodoList.DeleteTaskByIdAsync(id);
+        }
+        catch (Exception error)
+        {
+            Logger.LogInformation("HTTP Response message: {message}", error.Message);
+        }
+
+        await ReloadDataAsync();
+    }
+}

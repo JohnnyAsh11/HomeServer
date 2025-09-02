@@ -1,0 +1,210 @@
+﻿openapi: 3.0.1
+info:
+  title: TODO List Api
+  version: 1.0.0
+  description: Simple Api for tracking TODO items.
+
+paths:
+  /todo:
+    # MARK: Get all Tasks
+    get:
+      operationId: GetTasks
+      description: Gets the IDs of all tasks.
+      responses:
+        '200':
+          description: Retrieves a collection of task Ids.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TaskInfoDto"
+
+    # MARK: Post task
+    post:
+      operationId: PostTask
+      description: Posts a task that needs to be completed.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostTaskInfoDto"
+      responses:
+        '202':
+          description: Created task.
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int32
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+
+  /todo/id/{id}:
+    # MARK: Get by ID
+    get:
+      operationId: GetTaskById 
+      description: Gets a todo item by its ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskInfoDto"
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+
+    # MARK: Put by ID
+    put:
+      operationId: PutTaskById
+      description: Alters the data held within a task.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PutTaskInfoDto"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskInfoDto"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+
+    # MARK: Delete by ID
+    delete:
+      operationId: DeleteTaskById
+      description: Deletes the task with the given id.
+      parameters:
+       - name: id
+         in: path
+         required: true
+         schema:
+          type: integer
+          format: int32
+      responses:
+        '204':
+          description: No Content
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+
+components:
+  schemas:
+    # MARK: Error Dto
+    ErrorDto:
+      type: object
+      description: Error response to a given request.
+      additionalProperties: false
+      properties:
+        message:
+          type: array
+          description: The error message.
+          nullable: true
+          items:
+            type: string
+    # MARK: Task Info Dto
+    TaskInfoDto:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: The id of this task.
+        title:
+          type: string
+          description: The name of the task.
+        description:
+          type: string
+          description: A description of the task that needs to be completed.
+        dueDate:
+          type: string
+          description: The due date of the task.
+        estimatedTime:
+          type: number
+          format: float
+          description: The estimated time in hours to complete this task.
+        isComplete:
+          type: boolean
+          description: Whether or not this task is complete.
+    # MARK: Task Info Post Dto
+    PostTaskInfoDto:
+      type: object
+      additionalProperties: false
+      properties:
+        title:
+          type: string
+          description: The name of the task.
+        description:
+          type: string
+          description: A description of the task that needs to be completed.
+        dueDate:
+          type: string
+          description: The due date of the task.
+        estimatedTime:
+          type: number
+          format: float
+          description: The estimated time in hours to complete this task.
+        isComplete:
+          type: boolean
+          description: Whether or not this task is complete.
+    # MARK: Put Task Info Dto
+    PutTaskInfoDto:
+      type: object
+      additionalProperties: false
+      properties:
+        title:
+          type: string
+          description: The name of the task.
+        description:
+          type: string
+          description: A description of the task that needs to be completed.
+        dueDate:
+          type: string
+          description: The due date of the task.
+        estimatedTime:
+          type: number
+          format: float
+          description: The estimated time in hours to complete this task.
+        isComplete:
+          type: boolean
+          description: Whether or not this task is complete.

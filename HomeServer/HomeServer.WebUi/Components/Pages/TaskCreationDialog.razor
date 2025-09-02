@@ -1,0 +1,93 @@
+<MudDialog>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="12">
+                <MudTextField 
+                    @bind-Value="Title" 
+                    Label="Title" 
+                    Variant="Variant.Outlined"
+                    Required="true">
+                </MudTextField>
+            </MudItem>
+
+            <MudItem xs="6">
+                <MudTextField 
+                    @bind-Value="Description" 
+                    Label="Description"
+                    Lines="10" 
+                    Variant="Variant.Outlined" 
+                    Required="true">
+                </MudTextField>
+            </MudItem>
+
+            <MudItem xs="6">
+                <MudTextField
+                    @bind-Value="EstimatedTime" 
+                    Label="Estimated Time" 
+                    Variant="Variant.Outlined" 
+                    Required="true">
+                </MudTextField>
+            </MudItem>
+
+            <MudItem xs="6">
+                <MudDatePicker
+                    Label="Due Date"
+                    @bind-Date="DueDate">
+                </MudDatePicker>
+            </MudItem>
+            
+            <MudItem xs="6">
+                <MudTimePicker
+                    Label="Due Time"
+                    @bind-Time="Time">
+                </MudTimePicker>
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton
+            Color="Color.Success"
+            Variant="Variant.Filled"
+            OnClick="Confirm">
+            Confirm
+        </MudButton>
+        <MudButton
+            Color="Color.Error"
+            Variant="Variant.Filled"
+            OnClick="Cancel">
+            Cancel
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance? MudDialog { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public float EstimatedTime { get; set; } = 0.0f;
+    public DateTime? DueDate { get; set; } = DateTime.Today;
+    public TimeSpan? Time { get; set; } = TimeSpan.MinValue;
+
+    private void Confirm()
+    {
+        DueDate = new DateTime(
+            DueDate!.Value.Year,
+            DueDate!.Value.Month, 
+            DueDate!.Value.Day, 
+            Time!.Value.Hours, 
+            Time!.Value.Minutes, 
+            Time!.Value.Seconds);
+
+        TaskCreationDialogResult result = new(
+            Title,
+            Description,
+            EstimatedTime,
+            DueDate!.Value
+        );
+
+        MudDialog?.Close(DialogResult.Ok(result));
+    } 
+    private void Cancel() => MudDialog?.Close(DialogResult.Ok(DialogResultValue.Cancel));
+}

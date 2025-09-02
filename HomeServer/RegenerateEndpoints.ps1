@@ -1,0 +1,1 @@
+nswag run HomeServer.OpenApi/nswag-conf.nswag

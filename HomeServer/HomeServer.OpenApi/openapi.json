@@ -1,0 +1,297 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "TODO List Api",
+    "description": "Simple Api for tracking TODO items.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/todo": {
+      "get": {
+        "description": "Gets the IDs of all tasks.",
+        "operationId": "GetTasks",
+        "responses": {
+          "200": {
+            "description": "Retrieves a collection of task Ids.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TaskInfoDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Posts a task that needs to be completed.",
+        "operationId": "PostTask",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostTaskInfoDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Created task.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/todo/id/{id}": {
+      "get": {
+        "description": "Gets a todo item by its ID.",
+        "operationId": "GetTaskById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskInfoDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Alters the data held within a task.",
+        "operationId": "PutTaskById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutTaskInfoDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskInfoDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Deletes the task with the given id.",
+        "operationId": "DeleteTaskById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ErrorDto": {
+        "type": "object",
+        "description": "Error response to a given request.",
+        "additionalProperties": false,
+        "properties": {
+          "message": {
+            "type": "array",
+            "description": "The error message.",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "TaskInfoDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The id of this task.",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string",
+            "description": "The name of the task."
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of the task that needs to be completed."
+          },
+          "dueDate": {
+            "type": "string",
+            "description": "The due date of the task."
+          },
+          "estimatedTime": {
+            "type": "number",
+            "description": "The estimated time in hours to complete this task.",
+            "format": "float"
+          },
+          "isComplete": {
+            "type": "boolean",
+            "description": "Whether or not this task is complete."
+          }
+        }
+      },
+      "PostTaskInfoDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "The name of the task."
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of the task that needs to be completed."
+          },
+          "dueDate": {
+            "type": "string",
+            "description": "The due date of the task."
+          },
+          "estimatedTime": {
+            "type": "number",
+            "description": "The estimated time in hours to complete this task.",
+            "format": "float"
+          },
+          "isComplete": {
+            "type": "boolean",
+            "description": "Whether or not this task is complete."
+          }
+        }
+      },
+      "PutTaskInfoDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "The name of the task."
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of the task that needs to be completed."
+          },
+          "dueDate": {
+            "type": "string",
+            "description": "The due date of the task."
+          },
+          "estimatedTime": {
+            "type": "number",
+            "description": "The estimated time in hours to complete this task.",
+            "format": "float"
+          },
+          "isComplete": {
+            "type": "boolean",
+            "description": "Whether or not this task is complete."
+          }
+        }
+      }
+    }
+  }
+}
