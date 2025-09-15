@@ -16,7 +16,7 @@ HomeServer/
 │   ├── HomeServerContext.cs       # Defines the database context for interacting with the database through code.
 │   └── Migrate-Database.ps1       # Generates a new database migration with any edits made to models within the database.
 ├── HomeServer.Data/               # Holds the database itself.
-├── HomeServer.Services            # Project for future use in adding additional docker containers that do not require much besides a Dockerfile.
+├── HomeServer.Services            # Project for future use in adding additional docker services.
 ├── HomeServer.OpenApi/            # Defines the configuration files for auto-generated controllers and clients.
 │   ├── openapi.yaml               # Defines the api controller abstractions that will be generated. 
 │   └── nswag-conf.nswag           # Defines the specifics of the files that will be generated: particularly naming/location.
