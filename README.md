@@ -1,5 +1,7 @@
 # HomeServer
 
+ReadMe is still under construction.  Pardon my dust!
+
 ## General Project Structure
 
 ``` 
