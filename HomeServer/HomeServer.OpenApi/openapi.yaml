@@ -8,6 +8,8 @@ paths:
   /todo:
     # MARK: Get all Tasks
     get:
+      tags:
+        - Task      
       operationId: GetTasks
       description: Gets the IDs of all tasks.
       responses:
@@ -22,6 +24,8 @@ paths:
 
     # MARK: Post task
     post:
+      tags:
+        - Task
       operationId: PostTask
       description: Posts a task that needs to be completed.
       requestBody:
@@ -47,6 +51,8 @@ paths:
   /todo/id/{id}:
     # MARK: Get by ID
     get:
+      tags:
+        - Task
       operationId: GetTaskById 
       description: Gets a todo item by its ID.
       parameters:
@@ -72,6 +78,8 @@ paths:
 
     # MARK: Put by ID
     put:
+      tags:
+        - Task
       operationId: PutTaskById
       description: Alters the data held within a task.
       parameters:
@@ -108,6 +116,8 @@ paths:
 
     # MARK: Delete by ID
     delete:
+      tags:
+        - Task
       operationId: DeleteTaskById
       description: Deletes the task with the given id.
       parameters:

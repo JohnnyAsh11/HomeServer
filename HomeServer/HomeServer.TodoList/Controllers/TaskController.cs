@@ -16,7 +16,7 @@ namespace HomeServer.TodoList.Controllers
     public class TaskController(
         HomeServerContext DbContext,
         ILogger<TaskController> Logger
-    ) : IController
+    ) : ITaskController
     {
         /// <inheritdoc/>
         public async Task<IActionResult> DeleteTaskByIdAsync(int id, CancellationToken cancellationToken = default)

@@ -8,6 +8,9 @@
   "paths": {
     "/todo": {
       "get": {
+        "tags": [
+          "Task"
+        ],
         "description": "Gets the IDs of all tasks.",
         "operationId": "GetTasks",
         "responses": {
@@ -27,6 +30,9 @@
         }
       },
       "post": {
+        "tags": [
+          "Task"
+        ],
         "description": "Posts a task that needs to be completed.",
         "operationId": "PostTask",
         "requestBody": {
@@ -65,6 +71,9 @@
     },
     "/todo/id/{id}": {
       "get": {
+        "tags": [
+          "Task"
+        ],
         "description": "Gets a todo item by its ID.",
         "operationId": "GetTaskById",
         "parameters": [
@@ -102,6 +111,9 @@
         }
       },
       "put": {
+        "tags": [
+          "Task"
+        ],
         "description": "Alters the data held within a task.",
         "operationId": "PutTaskById",
         "parameters": [
@@ -158,6 +170,9 @@
         }
       },
       "delete": {
+        "tags": [
+          "Task"
+        ],
         "description": "Deletes the task with the given id.",
         "operationId": "DeleteTaskById",
         "parameters": [

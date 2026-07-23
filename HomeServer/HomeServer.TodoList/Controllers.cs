@@ -27,7 +27,7 @@ namespace HomeServer.TodoList
     using System = global::System;
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public interface IController
+    public interface ITaskController
     {
 
         /// <remarks>
@@ -76,11 +76,11 @@ namespace HomeServer.TodoList
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
 
-    public partial class Controller : Microsoft.AspNetCore.Mvc.ControllerBase
+    public partial class TaskController : Microsoft.AspNetCore.Mvc.ControllerBase
     {
-        private IController _implementation;
+        private ITaskController _implementation;
 
-        public Controller(IController implementation)
+        public TaskController(ITaskController implementation)
         {
             _implementation = implementation;
         }

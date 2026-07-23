@@ -27,7 +27,7 @@ namespace HomeServer.Client
     using System = global::System;
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial interface IClient
+    public partial interface ITaskClient
     {
         /// <remarks>
         /// Gets the IDs of all tasks.
@@ -107,7 +107,7 @@ namespace HomeServer.Client
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    internal partial class Client : IClient
+    internal partial class TaskClient : ITaskClient
     {
         #pragma warning disable 8618
         private string _baseUrl;
@@ -118,7 +118,7 @@ namespace HomeServer.Client
         private System.Text.Json.JsonSerializerOptions _instanceSettings;
 
     #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public Client(string baseUrl, System.Net.Http.HttpClient httpClient)
+        public TaskClient(string baseUrl, System.Net.Http.HttpClient httpClient)
     #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             BaseUrl = baseUrl;

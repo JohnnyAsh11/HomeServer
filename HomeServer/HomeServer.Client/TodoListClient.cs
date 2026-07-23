@@ -8,8 +8,8 @@ public class TodoListClient
     /// <summary>
     /// The Todo List client.
     /// </summary>
-    public IClient TodoList => _todoClient;
-    private Client _todoClient { get; }
+    public ITaskClient TodoList => _todoClient;
+    private TaskClient _todoClient { get; }
 
     /// <summary>
     /// The base url of the api.
@@ -37,7 +37,7 @@ public class TodoListClient
     /// </summary>
     public TodoListClient(HttpClient httpClient, string baseUrl)
     {
-        _todoClient = new Client(baseUrl, httpClient);
+        _todoClient = new TaskClient(baseUrl, httpClient);
         _baseUrl = baseUrl;
     }
 }
