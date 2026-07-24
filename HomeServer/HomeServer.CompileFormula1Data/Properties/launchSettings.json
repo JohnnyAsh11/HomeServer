@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "HomeServer.CompileFormula1Data": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:64515;http://localhost:64516"
+    }
+  }
+}
