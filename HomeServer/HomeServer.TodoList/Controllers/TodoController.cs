@@ -13,9 +13,9 @@ namespace HomeServer.TodoList.Controllers
     /// Accesses the data nested within the HomeServer task database.
     /// </summary>
     /// <param name="DbContext"></param>
-    public class TaskController(
+    public class TodoController(
         HomeServerContext DbContext,
-        ILogger<TaskController> Logger
+        ILogger<TodoController> Logger
     ) : ITaskController
     {
         /// <inheritdoc/>

@@ -48,7 +48,7 @@ namespace HomeServer.TodoList
             services.AddEndpointsApiExplorer();
             services.AddControllers();
             services.AddDbContext<HomeServerContext>();
-            services.AddScoped<IController, TaskController>();
+            services.AddScoped<ITaskController, TodoController>();
 
             // Open Telemetry
             OpenTelemetryBuilder otel = services.AddOpenTelemetry();
