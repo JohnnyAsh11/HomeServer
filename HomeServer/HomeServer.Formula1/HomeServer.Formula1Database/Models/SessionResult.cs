@@ -1,18 +1,18 @@
-﻿using System;
+﻿using Serilog.Sinks.OpenTelemetry;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HomeServer.Database
+namespace HomeServer.Formula1Database.Models
 {
     /// <summary>
-    /// Represents a Formula 1 session in the database.
+    /// The individual session result of a driver.
     /// </summary>
-    public class Session
+    public class SessionResult
     {
-
         /// <summary>
         /// Unique ID of the task within the database.
         /// </summary>
@@ -23,36 +23,35 @@ namespace HomeServer.Database
         /// Unique ID of Formula 1 session. (Provided by OpenF1)
         /// </summary>
         public int MeetingKey { get; set; }
-
-        /// <summary>
-        /// Year that the event took place.
-        /// </summary>
-        public int? Year { get; set; }
-
-        /// <summary>
-        /// The unique key for the circuit. (Provided by OpenF1)
-        /// </summary>
-        public int? CircuitKey { get; set; }
-
-        /// <summary>
-        /// The shortened name of the circuit.
-        /// </summary>
-        public string? ShortName { get; set; }
         
         /// <summary>
-        /// The name of the country hosting the session.
+        /// Did not finish?
         /// </summary>
-        public string? CountryName { get; set; }
+        public bool? DNF { get; set; }
 
         /// <summary>
-        /// The name of the session.  (Practice 1/Practice 2/Practice 3...)
+        /// Did not start?
         /// </summary>
-        public string? SessionName { get; set; }
+        public bool? DNS { get; set; }
 
         /// <summary>
-        /// The type of the session.  (Practice/Qualifying/Race)
+        /// Got disqualified?
         /// </summary>
-        public string? SessionType { get; set; }
+        public bool? DSQ { get; set; }
 
+        /// <summary>
+        /// Driver associated with this SessionResult.
+        /// </summary>
+        public int? DriverNumber { get; set; }
+
+        /// <summary>
+        /// Finishing position of the driver in this session.
+        /// </summary>
+        public int? FinishingPosition { get; set; }
+
+        /// <summary>
+        /// The time (in seconds) from the leader/winner of this session.
+        /// </summary>
+        public float GapToLeader { get; set; }
     }
 }

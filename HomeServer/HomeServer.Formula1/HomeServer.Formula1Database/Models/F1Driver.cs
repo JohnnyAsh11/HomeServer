@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HomeServer.Database
+namespace HomeServer.Formula1Database.Models
 {
     /// <summary>
     /// Represents a Formula 1 driver in the database.

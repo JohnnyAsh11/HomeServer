@@ -1,4 +1,7 @@
-﻿namespace HomeServer.CompileFormula1Data
+﻿using HomeServer.Formula1Database;
+using InfluxDB.Client;
+
+namespace HomeServer.CompileFormula1Data
 {
     public class Program
     {
@@ -27,7 +30,7 @@
                 .GetRequiredService<IHttpClientFactory>()
                 .CreateClient("OpenF1");
 
-            HttpResponseMessage resp = await client.GetAsync("session_result?session_key=11227");
+            HttpResponseMessage resp = await client.GetAsync("intervals?session_key=9165&interval<0.005");
             Console.WriteLine(await resp.Content.ReadAsStringAsync());
         }
 
@@ -44,6 +47,15 @@
             {
                 client.BaseAddress = new Uri(uri);
             });
+
+            services.AddSingleton(_ =>
+            {
+                return new InfluxDBClient(
+                    "http://localhost:8086",
+                    "YOUR_TOKEN");
+            });
+
+            services.AddSingleton<Formula1Repository>();
         }
     }
 }
