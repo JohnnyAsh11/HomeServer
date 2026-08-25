@@ -16,4 +16,8 @@
     <PackageReference Include="Microsoft.OpenApi" Version="2.11.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\HomeServer.Formula1Database\HomeServer.Formula1Database.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,0 +1,2 @@
+# Ignore the data directory since this contains random db files.
+HomeServer.Data/

@@ -24,6 +24,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeServer.WebUi", "HomeServer.WebUi\HomeServer.WebUi.csproj", "{4AF1B180-86DF-4D44-A932-149F6E0D39B1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HomeServer.Formula1", "HomeServer.Formula1", "{45298B98-608F-4BBE-AC68-EB2325D28E8E}"
+	ProjectSection(SolutionItems) = preProject
+		HomeServer.Formula1\docker-compose.yml = HomeServer.Formula1\docker-compose.yml
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeServer.Formula1Api", "HomeServer.Formula1\HomeServer.Formula1Api\HomeServer.Formula1Api.csproj", "{30DD73A7-25C4-6D03-0215-A43BB94B4C54}"
 EndProject

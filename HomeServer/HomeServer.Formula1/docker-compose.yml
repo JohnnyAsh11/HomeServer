@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+
+  influxdb:
+
+    image: influxdb:2.7
+
+    ports:
+      - "8086:8086"
+
+    volumes:
+      - ../HomeServer.Data/Formula1Database:/var/lib/influxdb2
+
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: admin123
+      DOCKER_INFLUXDB_INIT_ORG: HomeServer
+      DOCKER_INFLUXDB_INIT_BUCKET: Formula1
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: super-secret-token
+
+  grafana:
+
+    image: grafana/grafana
+
+    ports:
+      - "3000:3000"
+
+volumes:
+  influxdb-data:
