@@ -53,28 +53,28 @@ namespace HomeServer.Formula1Api
              */
 
 
-            for (int i = 1; i < 44; i++)
+            for (int i = 2024; i < 2027; i++)
             {
+                Console.WriteLine($" - - - - - - Races for the year {i} - - - - - -");
                 //HttpResponseMessage resp = await client.GetAsync($"intervals?session_key=11334&interval<{i}");
-                HttpResponseMessage resp = await client.GetAsync($"laps?session_key=11334&lap_number={i}");
+                HttpResponseMessage resp = await client.GetAsync($"sessions?date_start%3E%3D{i}-01-01&date_end%3C%3D{i}-12-10");
 
                 if (resp.Content is null)
                 {
-                    throw new Exception("Failed to retrieve lap data.");
+                    throw new Exception($"Failed to retrieve session data from the year {i}.");
                 }
 
                 string json = await resp.Content.ReadAsStringAsync();
-                Console.WriteLine(json);
-                List<RaceLapDto>? raceLapDtos = JsonSerializer.Deserialize<List<RaceLapDto>>(json);
+                List<SessionDto>? sessionDtos = JsonSerializer.Deserialize<List<SessionDto>>(json);
 
-                if (raceLapDtos is null)
+                if (sessionDtos is null)
                 {
-                    throw new Exception("Failed to deserialize race lap data.");
+                    throw new Exception("Failed to deserialize session data.");
                 }
 
-                foreach (RaceLapDto raceLapDto in raceLapDtos)
+                foreach (SessionDto sessionDto in sessionDtos)
                 {
-                    await repository.SaveAsync(CreateTelemetryEntry(raceLapDto));
+                    Console.WriteLine($"{sessionDto.SessionKey}: {sessionDto.CircuitShortName} {sessionDto.SessionName}");
                 }
 
                 // Rate limiting.
@@ -96,7 +96,6 @@ namespace HomeServer.Formula1Api
                 client.BaseAddress = new Uri(uri);
             });
 
-            //lzZv3ncJgqIrI1IvkSEbKgNkhLkNKcDGpnOkB0kxYHPEonjTPX3OaE-XGeFwCrJZ3bpODxCiaiCf09azgHdi0w==
             services.AddSingleton<IInfluxDBClient>(_ =>
             {
                 return new InfluxDBClient(
@@ -107,6 +106,9 @@ namespace HomeServer.Formula1Api
             services.AddSingleton<Formula1Repository>();
         }
 
+        /// <summary>
+        /// Converts the data from a racing lap to a telemetry entry.
+        /// </summary>
         public static TelemetryEntry CreateTelemetryEntry(RaceLapDto raceLapDto)
         {
             return new TelemetryEntry

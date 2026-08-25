@@ -29,6 +29,11 @@ namespace HomeServer.Formula1Database
         public async Task SaveAsync(TelemetryEntry telemetry)
         {
             IWriteApiAsync write = _client.GetWriteApiAsync();
+
+            // NOTE:
+            // The Driver Number, Session and Meeting are tagged.
+            // That is because these parts of the entry should act as
+            // headers for the sector and lap timing data.
             PointData point = PointData
                 .Measurement("telemetry")
                 .Tag("driver number", telemetry.DriverNumber.ToString())

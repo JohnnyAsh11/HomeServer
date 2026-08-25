@@ -17,25 +17,26 @@ namespace HomeServer.Formula1Database.Models
         /// </summary>
         [Key]
         public int Id { get; set; }
+
         /// <summary>
         /// Database generated unique ID of the session.
         /// </summary>
         public int SessionId { get; set; }
+
         /// <summary>
         /// Database generated unique ID of the meeting.
         /// </summary>
         public int MeetingId { get; set; }
 
-
         /// <summary>
         /// Unique ID of Formula 1 meeting. (Provided by OpenF1)
         /// </summary>
         public int MeetingKey { get; set; }
+
         /// <summary>
         /// Unique ID of Formula 1 session. (Provided by OpenF1)
         /// </summary>
         public int SessionKey { get; set; }
-
 
         /// <summary>
         /// Did not finish?
