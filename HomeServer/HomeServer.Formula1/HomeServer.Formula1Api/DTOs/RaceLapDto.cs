@@ -5,7 +5,7 @@ namespace HomeServer.Formula1Api
     public class RaceLapDto
     {
         [JsonPropertyName("date_start")]
-        public DateTime Date { get; set; }
+        public DateTime? Date { get; set; }
 
         [JsonPropertyName("driver_number")]
         public int DriverNumber { get; set; } = 0;
@@ -26,16 +26,16 @@ namespace HomeServer.Formula1Api
         public int? I2Speed { get; set; }
 
         [JsonPropertyName("is_pit_out_lap")]
-        public bool IsPitOutLap { get; set; } = false;
+        public bool? IsPitOutLap { get; set; } = false;
 
         [JsonPropertyName("lap_duration")]
         public float? LapDuration { get; set; }
 
         [JsonPropertyName("lap_number")]
-        public int LapNumber { get; set; } = 0;
+        public int? LapNumber { get; set; } = 0;
 
         [JsonPropertyName("meeting_key")]
-        public int MeetingKey { get; set; } = 0;
+        public int? MeetingKey { get; set; } = 0;
 
         [JsonPropertyName("segments_sector_1")]
         public List<int?> MiniSectors1 { get; set; } = [];
@@ -47,7 +47,7 @@ namespace HomeServer.Formula1Api
         public List<int?> MiniSectors3 { get; set; } = [];
 
         [JsonPropertyName("session_key")]
-        public int SessionKey { get; set; } = 0;
+        public int? SessionKey { get; set; } = 0;
 
         [JsonPropertyName("st_speed")]
         public int? SpeedTrap { get; set; }
