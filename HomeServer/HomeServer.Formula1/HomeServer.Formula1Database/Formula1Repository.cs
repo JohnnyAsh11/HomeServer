@@ -1,6 +1,7 @@
 ﻿using HomeServer.Formula1Database.Models;
 using InfluxDB.Client;
 using InfluxDB.Client.Api.Domain;
+using InfluxDB.Client.Core.Flux.Domain;
 using InfluxDB.Client.Writes;
 
 namespace HomeServer.Formula1Database
@@ -47,6 +48,36 @@ namespace HomeServer.Formula1Database
                 .Timestamp(telemetry.Timestamp, WritePrecision.Ms);
 
             await write.WritePointAsync(point, Bucket, Org);
+        }
+
+        public async Task QueryAsync()
+        {
+            IQueryApi queryApi = _client.GetQueryApi();
+
+            DateTime start = DateTime.Now;
+            DateTime end = start.AddDays(-7);
+            string query =
+                $"""
+                from(bucket: "Formula1")
+                    |> range(start: {end:yyyy-MM-ddTHH:mm:ssZ}, stop: {start:yyyy-MM-ddTHH:mm:ssZ})
+                    |> filter(fn: (r) => r["_measurement"] == "telemetry")
+                    |> filter(fn: (r) => r["_field"] == "Lap Time")
+                """;
+
+            List<FluxTable> tables = await queryApi.QueryAsync(query, Org);
+
+            foreach (FluxTable table in tables)
+            {
+                foreach (FluxRecord? record in table.Records)
+                {
+                    if (record is null)
+                    {
+                        continue;
+                    }
+
+                    Console.WriteLine($"{record.GetTime()}: {record.GetValue()}");
+                }
+            }
         }
     }
 }
