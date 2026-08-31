@@ -30,115 +30,32 @@ namespace HomeServer.Formula1Api
             app.MapControllers();
             app.Start();
 
-            HttpClient client = app.Services
-                .GetRequiredService<IHttpClientFactory>()
-                .CreateClient("OpenF1");
-
             Formula1Repository repository = app.Services.GetRequiredService<Formula1Repository>();
+            OpenF1Client f1Client = app.Services.GetRequiredService<OpenF1Client>();
 
-
-            /*
-             
-            All sessions for a given year:
-            https://api.openf1.org/v1/sessions?date_start%3E%3D2023-01-01&date_end%3C%3D2023-12-10
-
-            All tire stints for a given race:
-            https://api.openf1.org/v1/stints?session_key=9165
-
-            All sessions within a meeting:
-            https://api.openf1.org/v1/sessions?meeting_key=1216
-
-            Weather data for a given session:
-            https://api.openf1.org/v1/weather?meeting_key=1216&session_key=9286
-             
-             */
-
-            // Reading in the session data.
-            for (int i = 2026; i < 2027; i++)
+            // Getting the active drivers since 2022 from the API. 
+            List<DriverDto>? driverDtos = await f1Client.QueryApiAsync<List<DriverDto>>("drivers");
+            if (driverDtos is null || driverDtos.Count == 0)
             {
-                Console.WriteLine($" - - - - - - Races for the year {i} - - - - - -");
-                //HttpResponseMessage resp = await client.GetAsync($"intervals?session_key=11334&interval<{i}");
-                HttpResponseMessage respSessions = await client.GetAsync($"sessions?date_start%3E%3D{i}-01-01&date_end%3C%3D{i}-12-10");
-
-                if (respSessions.Content is null)
-                {
-                    throw new Exception($"Failed to retrieve session data from the year {i}.");
-                }
-
-                // This is relatively safe deserialization since if there are session
-                // keys returned then the sessions exist in the API.
-                string json = await respSessions.Content.ReadAsStringAsync();
-                List<SessionDto>? sessionDtos = JsonSerializer.Deserialize<List<SessionDto>>(json);
-
-                if (sessionDtos is null)
-                {
-                    throw new Exception("Failed to deserialize session data.");
-                }
-
-                // Getting the lap timing data for each session.
-                foreach (SessionDto sessionDto in sessionDtos)
-                {
-                    Console.WriteLine($"{sessionDto.SessionKey}: {sessionDto.CircuitShortName} {sessionDto.SessionName}");
-                    HttpResponseMessage respLap = await client.GetAsync($"laps?session_key={sessionDto.SessionKey}");
-
-                    if (respLap.Content is null)
-                    {
-                        throw new Exception($"Failed to retrieve lap data for session {sessionDto.SessionKey}.");
-                    }
-
-                    string lapJson = await respLap.Content.ReadAsStringAsync();
-                    List<RaceLapDto>? lapDtos = null;
-
-                    // Attempt to deserialize the lap data.
-                    // NOTE: There are many failure conditions:
-                    // - Laps may be incomplete due to DNFs
-                    // - Laps may be incomplete due to race cancellations
-                    // - Laps may be incomplete because the session has not yet happened.
-                    try
-                    {
-                        lapDtos = JsonSerializer.Deserialize<List<RaceLapDto>>(lapJson);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error deserializing lap data for session {sessionDto.SessionKey}: {ex.Message}");
-
-                        ErrorDto? err = JsonSerializer.Deserialize<ErrorDto>(lapJson);
-                        
-                        // If the API returned the error, continue onward.
-                        if (err is not null)
-                        {
-                            continue;
-                        }
-                        // Otherwise, some other genuine error occurred.
-                        else
-                        {
-                            throw new Exception($"Some error has occurred for session: {sessionDto.CircuitShortName}-{sessionDto.SessionKey}.");
-                        }
-                    }
-
-                    if (lapDtos is null)
-                    {
-                        throw new Exception("Failed to deserialize lap data.");
-                    }
-
-                    // Send the laps into InfluxDB.
-                    foreach (RaceLapDto lapDto in lapDtos)
-                    {
-                        // Do not count null laps or laps with a lap time of 0 or laps without a proper timestamp.
-                        if (lapDto.LapDuration is null || lapDto.LapDuration <= 0.0f || lapDto.Date is null)
-                        {
-                            continue;
-                        }
-
-                        await repository.SaveAsync(CreateTelemetryEntry(lapDto));
-                    }
-
-                    await Task.Delay(2000);
-                }
-
-                // Rate limiting.
-                await Task.Delay(2000);
+                throw new Exception("There are no drivers which is not possible.");
             }
+
+            // Sorting the drivers by their names to ensure no duplicates.
+            driverDtos = [.. driverDtos.DistinctBy(driver => driver.BroadcastName)];
+
+            // Creating a scope for the dbContext.
+            AsyncServiceScope scope = app.Services.CreateAsyncScope();
+            Formula1Context dbContext = scope.ServiceProvider.GetRequiredService<Formula1Context>();
+
+            // Adding the data to the database.
+            foreach (DriverDto driver in driverDtos)
+            {
+                await dbContext.AddAsync(DtoToDriverModel(driver));
+            }
+
+            // Saving the data and closing the scope.
+            await dbContext.SaveChangesAsync();
+            await scope.DisposeAsync();
         }
 
         /// <summary>
@@ -162,7 +79,9 @@ namespace HomeServer.Formula1Api
                     "super-secret-token");
             });
 
+            services.AddSingleton<OpenF1Client>();
             services.AddSingleton<Formula1Repository>();
+            services.AddDbContext<Formula1Context>();
         }
 
         /// <summary>
@@ -181,6 +100,20 @@ namespace HomeServer.Formula1Api
                 LapNumber = raceLapDto.LapNumber ?? 0,
                 MeetingKey = raceLapDto.MeetingKey ?? 0,
                 SessionKey = raceLapDto.SessionKey ?? 0
+            };
+        }
+
+        public static F1DriverModel DtoToDriverModel(DriverDto dto)
+        {
+            return new F1DriverModel
+            {
+                BroadcastName = dto.BroadcastName,
+                DriverName = dto.FullName,
+                DriverNumber = dto.DriverNumber,
+                NameAcronym = dto.NameAcronym,
+                TeamColor = dto.TeamColor,
+                TeamName = dto.TeamName,
+                HeadshotUrl = dto.HeadshotUrl
             };
         }
     }

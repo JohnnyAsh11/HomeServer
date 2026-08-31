@@ -10,11 +10,21 @@ namespace HomeServer.Formula1Api
     /// <summary>
     /// Manages interactions between this program and the OpenF1 API.
     /// </summary>
-    public class OpenF1Client(Logger<OpenF1Client> logger, HttpClient client)
+    public class OpenF1Client
     {
-        private Logger<OpenF1Client> _logger = logger;
-        private HttpClient _client = client;
         private const int _RateLimit = 2000;
+        private const string _BaseAddress = "OpenF1";
+        private ILogger<OpenF1Client> _logger;
+        private IHttpClientFactory _clientFactory;
+        private HttpClient _client;
+
+        public OpenF1Client(ILogger<OpenF1Client> logger, IHttpClientFactory clientFactory)
+        {
+            _clientFactory = clientFactory;
+            _logger = logger;
+
+            _client = clientFactory.CreateClient(_BaseAddress);
+        }
         
         /// <summary>
         /// Performs an HTTP request on the passed in endpoint.  
