@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeServer.Formula1Database.Migrations
 {
     [DbContext(typeof(Formula1Context))]
-    [Migration("20260731050613_InitializeDb")]
-    partial class InitializeDb
+    [Migration("20260831033725_InitialDb")]
+    partial class InitialDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -117,6 +117,9 @@ namespace HomeServer.Formula1Database.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("NameAcronym")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TeamColor")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TeamName")

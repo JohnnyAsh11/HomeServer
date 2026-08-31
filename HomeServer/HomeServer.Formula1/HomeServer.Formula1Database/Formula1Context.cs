@@ -65,7 +65,8 @@ namespace HomeServer.Formula1Database
             base.OnConfiguring(optionsBuilder);
 
             // Database file within the container.
-            optionsBuilder.UseSqlite("Data Source=/data/Formula1Data.db;");
+            // optionsBuilder.UseSqlite("Data Source=/data/Formula1Data.db;");
+            optionsBuilder.UseSqlite("Data Source=../../HomeServer.Data/Formula1Data.db;");
         }
     }
 }

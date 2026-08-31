@@ -47,5 +47,10 @@ namespace HomeServer.Formula1Database.Models
         /// The name of the team the driver is currently racing for.
         /// </summary>
         public string? TeamName { get; set; }
+
+        /// <summary>
+        /// The hex color of the driver's current team.
+        /// </summary>
+        public string? TeamColor { get; set; }
     }
 }

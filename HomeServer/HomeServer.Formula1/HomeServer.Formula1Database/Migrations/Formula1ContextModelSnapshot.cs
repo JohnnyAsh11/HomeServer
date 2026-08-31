@@ -116,6 +116,9 @@ namespace HomeServer.Formula1Database.Migrations
                     b.Property<string>("NameAcronym")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("TeamColor")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("TeamName")
                         .HasColumnType("TEXT");
 

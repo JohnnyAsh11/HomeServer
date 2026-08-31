@@ -5,7 +5,7 @@
 namespace HomeServer.Formula1Database.Migrations
 {
     /// <inheritdoc />
-    public partial class InitializeDb : Migration
+    public partial class InitialDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -21,7 +21,8 @@ namespace HomeServer.Formula1Database.Migrations
                     DriverName = table.Column<string>(type: "TEXT", nullable: true),
                     NameAcronym = table.Column<string>(type: "TEXT", nullable: true),
                     HeadshotUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    TeamName = table.Column<string>(type: "TEXT", nullable: true)
+                    TeamName = table.Column<string>(type: "TEXT", nullable: true),
+                    TeamColor = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
