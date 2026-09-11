@@ -3,6 +3,7 @@ using HomeServer.Formula1Api.DTOs;
 using HomeServer.Formula1Database;
 using HomeServer.Formula1Database.Models;
 using InfluxDB.Client;
+using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
 namespace HomeServer.Formula1Api
@@ -30,6 +31,17 @@ namespace HomeServer.Formula1Api
             app.MapControllers();
             app.Start();
 
+            // Ensuring that all migrations are applied to the database.
+            {
+                // Creating a scope for the db context.
+                AsyncServiceScope scope = app.Services.CreateAsyncScope();
+                Formula1Context dbContext = scope.ServiceProvider.GetRequiredService<Formula1Context>();
+
+                // Applying the migrations and disposing the scope.
+                await dbContext.Database.MigrateAsync();
+                await scope.DisposeAsync();
+            }
+
             Formula1Repository repository = app.Services.GetRequiredService<Formula1Repository>();
             OpenF1Client f1Client = app.Services.GetRequiredService<OpenF1Client>();
 
@@ -40,22 +52,29 @@ namespace HomeServer.Formula1Api
                 throw new Exception("There are no drivers which is not possible.");
             }
 
+            // Reversing the contents of this list to contain 
+            // the most recent driver entries first.  This ensure initial entry
+            // of data is the most recent and does not need to be updated. 
+            driverDtos.Reverse();
+
             // Sorting the drivers by their names to ensure no duplicates.
             driverDtos = [.. driverDtos.DistinctBy(driver => driver.BroadcastName)];
-
-            // Creating a scope for the dbContext.
-            AsyncServiceScope scope = app.Services.CreateAsyncScope();
-            Formula1Context dbContext = scope.ServiceProvider.GetRequiredService<Formula1Context>();
-
-            // Adding the data to the database.
-            foreach (DriverDto driver in driverDtos)
+           
             {
-                await dbContext.AddAsync(DtoToDriverModel(driver));
-            }
+                // Creating a scope for the dbContext.
+                AsyncServiceScope scope = app.Services.CreateAsyncScope();
+                Formula1Context dbContext = scope.ServiceProvider.GetRequiredService<Formula1Context>();
 
-            // Saving the data and closing the scope.
-            await dbContext.SaveChangesAsync();
-            await scope.DisposeAsync();
+                // Adding the data to the database.
+                foreach (DriverDto driver in driverDtos)
+                {
+                    await dbContext.AddAsync(DtoToDriverModel(driver));
+                }
+
+                // Saving the data and closing the scope.
+                await dbContext.SaveChangesAsync();
+                await scope.DisposeAsync();
+            }
         }
 
         /// <summary>
