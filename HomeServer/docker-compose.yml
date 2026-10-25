@@ -1,4 +1,5 @@
 services:
+  # MARK: PROXY
   traefik:
     image: traefik:v3.5
     networks:
@@ -53,6 +54,7 @@ services:
     volumes:
       - "./HomeServer.Data/TodoDatabase:/data"
 
+  # MARK: WEB UI
   homeserver-webui:
     image: homeserver-webui
     networks:
@@ -75,6 +77,16 @@ services:
         configuration: Debug
     environment:
       ASPNETCORE_URLS: "http://+:80"
+
+  # MARK: OLLAMA
+  homeserver-ai:
+    networks:
+      - homeserver-network
+    image: ollama/ollama
+    ports: 
+      - "11434:11434"
+    volumes: 
+      - "${USERPROFILE}/.ollama:/root/.ollama"
 
 networks:
   homeserver-network:
