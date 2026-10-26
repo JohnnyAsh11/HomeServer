@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace HomeServer.Client;
 
-public class TodoListClient
+public class HomeServerClient
 {
     /// <summary>
     /// The Todo List client.
@@ -35,7 +35,7 @@ public class TodoListClient
     /// <summary>
     /// Constructs the Todo List client for use within primarily the web app project.
     /// </summary>
-    public TodoListClient(HttpClient httpClient, string baseUrl)
+    public HomeServerClient(HttpClient httpClient, string baseUrl)
     {
         _todoClient = new TaskClient(baseUrl, httpClient);
         _baseUrl = baseUrl;
