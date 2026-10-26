@@ -16,15 +16,12 @@ namespace HomeServer.Database
     public class MessageContent
     {
         /// <summary>
-<<<<<<< HEAD
         /// Unique ID of this message.
         /// </summary>
         [Key]
         public int Id { get; set; }
 
         /// <summary>
-=======
->>>>>>> a5f1fbd74d7617ae1a1d23c6f6bc6b056b4546bd
         /// When this message was sent.
         /// </summary>
         public DateTime Timestamp { get; set; }
@@ -58,7 +55,6 @@ namespace HomeServer.Database
         public DateTime StartDate { get; set; }
 
         /// <summary>
-<<<<<<< HEAD
         /// The title of this chat.
         /// </summary>
         public string Title { get; set; } = string.Empty;
@@ -70,8 +66,6 @@ namespace HomeServer.Database
         public bool IsDeleted { get; set; } = false;
 
         /// <summary>
-=======
->>>>>>> a5f1fbd74d7617ae1a1d23c6f6bc6b056b4546bd
         /// All of the messages sent to and from the assistant.
         /// </summary>
         public List<MessageContent> Messages { get; set; } = [];
