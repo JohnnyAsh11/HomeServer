@@ -48,11 +48,11 @@ services:
       - "5050:8080"
     build:
       context: .
-      dockerfile: ./HomeServer.TodoList/Dockerfile
+      dockerfile: ./HomeServer.Api/Dockerfile
       args:
         configuration: Debug
     volumes:
-      - "./HomeServer.Data/TodoDatabase:/data"
+      - "./HomeServer.Data/HomeServerDatabase:/data"
 
   # MARK: WEB UI
   homeserver-webui:

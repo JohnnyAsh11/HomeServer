@@ -1,4 +1,4 @@
 #!/bin/bash
 
-echo "Starting the HomeServer Todo List API..."
-dotnet HomeServer.TodoList.dll
+echo "Starting the HomeServer Api..."
+dotnet HomeServer.Api.dll

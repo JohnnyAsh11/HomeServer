@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HomeServer.Database;
-using HomeServer.TodoList;
+using HomeServer.Api;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace HomeServer.TodoList.Controllers
+namespace HomeServer.Api.Controllers
 {
     /// <summary>
     /// Accesses the data nested within the HomeServer task database.
