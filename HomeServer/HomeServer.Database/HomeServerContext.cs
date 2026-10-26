@@ -15,6 +15,11 @@ namespace HomeServer.Database
         /// </summary>
         public DbSet<HomeServerTask> Tasks { get; set; }
 
+        /// <summary>
+        /// A collection of all of the chat history between the user and the AI assistant.
+        /// </summary>
+        public DbSet<StoredChatHistory> ChatHistories { get; set; }
+
         /// <inheritdoc/>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -22,6 +27,10 @@ namespace HomeServer.Database
 
             modelBuilder.Entity<HomeServerTask>()
                 .HasIndex(t => t.Id)
+                .IsUnique();
+
+            modelBuilder.Entity<StoredChatHistory>()
+                .HasIndex(h => h.Id)
                 .IsUnique();
         }
 
@@ -34,7 +43,7 @@ namespace HomeServer.Database
             // optionsBuilder.UseSqlite("Data Source=../HomeServer.Data/TodoDatabase/TodoData.db;");
 
             // Database file within the container.
-            optionsBuilder.UseSqlite("Data Source=/data/TodoData.db;");
+            optionsBuilder.UseSqlite("Data Source=/data/HomeServerData.db;");
         }
     }
 }
