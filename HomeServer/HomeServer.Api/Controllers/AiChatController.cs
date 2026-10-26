@@ -25,7 +25,7 @@ namespace HomeServer.Api.Controllers
             Logger.LogInformation("Called GetAiChatsAsync");
 
             ChatHistory history = [];
-            history.AddUserMessage("This is a test message.  Please give me a fun fact.");
+            history.AddUserMessage("This is a test message.  Please give me the name and details of a random Magic: The Gathering Mythic or Rare card.");
 
             ChatMessageContent response = await AiClient.GetChatMessageContentAsync(history, _settings);
 
