@@ -27,6 +27,122 @@ namespace HomeServer.TodoList
     using System = global::System;
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public interface IChatController
+    {
+
+        /// <remarks>
+        /// Gets the IDs of all AI chats.
+        /// </remarks>
+
+        /// <returns>Retrieves a collection of AI chat IDs.</returns>
+
+        System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.ActionResult<System.Collections.Generic.ICollection<ChatInfoDto>>> GetAiChatsAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <remarks>
+        /// Posts a new AI chat.
+        /// </remarks>
+
+        /// <returns>Created chat.</returns>
+
+        System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.ActionResult<int>> PostAiChatAsync(ChatInfoDto? body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <remarks>
+        /// Gets an AI chat by its ID.
+        /// </remarks>
+
+        /// <returns>OK</returns>
+
+        System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.ActionResult<ChatContentDto>> GetAiChatByIdAsync(int id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <remarks>
+        /// Posts a message to an AI chat by its ID.
+        /// </remarks>
+
+
+
+        /// <returns>Created message.</returns>
+
+        System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.ActionResult<int>> PostMessageToAiChatByIdAsync(int id, MessageContentDto? body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <remarks>
+        /// Deletes the AI chat with the given id.
+        /// </remarks>
+
+        /// <returns>No Content</returns>
+
+        System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.IActionResult> DeleteAiChatByIdAsync(int id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+
+    public partial class ChatController : Microsoft.AspNetCore.Mvc.ControllerBase
+    {
+        private IChatController _implementation;
+
+        public ChatController(IChatController implementation)
+        {
+            _implementation = implementation;
+        }
+
+        /// <remarks>
+        /// Gets the IDs of all AI chats.
+        /// </remarks>
+        /// <returns>Retrieves a collection of AI chat IDs.</returns>
+        [Microsoft.AspNetCore.Mvc.HttpGet, Microsoft.AspNetCore.Mvc.Route("ai")]
+        public System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.ActionResult<System.Collections.Generic.ICollection<ChatInfoDto>>> GetAiChats(System.Threading.CancellationToken cancellationToken)
+        {
+
+            return _implementation.GetAiChatsAsync(cancellationToken);
+        }
+
+        /// <remarks>
+        /// Posts a new AI chat.
+        /// </remarks>
+        /// <returns>Created chat.</returns>
+        [Microsoft.AspNetCore.Mvc.HttpPost, Microsoft.AspNetCore.Mvc.Route("ai")]
+        public System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.ActionResult<int>> PostAiChat([Microsoft.AspNetCore.Mvc.FromBody] ChatInfoDto? body, System.Threading.CancellationToken cancellationToken)
+        {
+
+            return _implementation.PostAiChatAsync(body, cancellationToken);
+        }
+
+        /// <remarks>
+        /// Gets an AI chat by its ID.
+        /// </remarks>
+        /// <returns>OK</returns>
+        [Microsoft.AspNetCore.Mvc.HttpGet, Microsoft.AspNetCore.Mvc.Route("ai/{id}")]
+        public System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.ActionResult<ChatContentDto>> GetAiChatById(int id, System.Threading.CancellationToken cancellationToken)
+        {
+
+            return _implementation.GetAiChatByIdAsync(id, cancellationToken);
+        }
+
+        /// <remarks>
+        /// Posts a message to an AI chat by its ID.
+        /// </remarks>
+        /// <returns>Created message.</returns>
+        [Microsoft.AspNetCore.Mvc.HttpPost, Microsoft.AspNetCore.Mvc.Route("ai/{id}")]
+        public System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.ActionResult<int>> PostMessageToAiChatById(int id, [Microsoft.AspNetCore.Mvc.FromBody] MessageContentDto? body, System.Threading.CancellationToken cancellationToken)
+        {
+
+            return _implementation.PostMessageToAiChatByIdAsync(id, body, cancellationToken);
+        }
+
+        /// <remarks>
+        /// Deletes the AI chat with the given id.
+        /// </remarks>
+        /// <returns>No Content</returns>
+        [Microsoft.AspNetCore.Mvc.HttpDelete, Microsoft.AspNetCore.Mvc.Route("ai/{id}")]
+        public System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.IActionResult> DeleteAiChatById(int id, System.Threading.CancellationToken cancellationToken)
+        {
+
+            return _implementation.DeleteAiChatByIdAsync(id, cancellationToken);
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public interface ITaskController
     {
 
@@ -154,6 +270,98 @@ namespace HomeServer.TodoList
 
         [System.Text.Json.Serialization.JsonPropertyName("message")]
         public System.Collections.Generic.List<string>? Message { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ChatInfoDto
+    {
+        /// <summary>
+        /// The id of this chat.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public int? Id { get; set; } = default!;
+
+        /// <summary>
+        /// The name of the chat.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("title")]
+        public string? Title { get; set; } = default!;
+
+        /// <summary>
+        /// Whether or not this chat is deleted.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("isDeleted")]
+        public bool? IsDeleted { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ChatContentDto
+    {
+        /// <summary>
+        /// The id of this chat.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public int? Id { get; set; } = default!;
+
+        /// <summary>
+        /// The name of the chat.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("title")]
+        public string? Title { get; set; } = default!;
+
+        /// <summary>
+        /// Whether or not this chat is deleted.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("isDeleted")]
+        public bool? IsDeleted { get; set; } = default!;
+
+        /// <summary>
+        /// All of the messages sent to and from the assistant.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("messages")]
+        public System.Collections.Generic.List<MessageContentDto>? Messages { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class MessageContentDto
+    {
+        /// <summary>
+        /// The id of this message.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public int? Id { get; set; } = default!;
+
+        /// <summary>
+        /// The timestamp of when this message was sent.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("timestamp")]
+        public string? Timestamp { get; set; } = default!;
+
+        /// <summary>
+        /// The content of the message.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("message")]
+        public string? Message { get; set; } = default!;
+
+        /// <summary>
+        /// The role of the user who sent this message.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("userRole")]
+        public int? UserRole { get; set; } = default!;
 
     }
 

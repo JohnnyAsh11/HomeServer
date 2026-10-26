@@ -6,6 +6,204 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/ai": {
+      "get": {
+        "tags": [
+          "Chat"
+        ],
+        "description": "Gets the IDs of all AI chats.",
+        "operationId": "GetAiChats",
+        "responses": {
+          "200": {
+            "description": "Retrieves a collection of AI chat IDs.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChatInfoDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Chat"
+        ],
+        "description": "Posts a new AI chat.",
+        "operationId": "PostAiChat",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatInfoDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Created chat.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/{id}": {
+      "get": {
+        "tags": [
+          "Chat"
+        ],
+        "description": "Gets an AI chat by its ID.",
+        "operationId": "GetAiChatById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatContentDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Chat"
+        ],
+        "description": "Posts a message to an AI chat by its ID.",
+        "operationId": "PostMessageToAiChatById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageContentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Created message.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Chat"
+        ],
+        "description": "Deletes the AI chat with the given id.",
+        "operationId": "DeleteAiChatById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/todo": {
       "get": {
         "tags": [
@@ -218,6 +416,75 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "ChatInfoDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The id of this chat.",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string",
+            "description": "The name of the chat."
+          },
+          "isDeleted": {
+            "type": "boolean",
+            "description": "Whether or not this chat is deleted."
+          }
+        }
+      },
+      "ChatContentDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The id of this chat.",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string",
+            "description": "The name of the chat."
+          },
+          "isDeleted": {
+            "type": "boolean",
+            "description": "Whether or not this chat is deleted."
+          },
+          "messages": {
+            "type": "array",
+            "description": "All of the messages sent to and from the assistant.",
+            "items": {
+              "$ref": "#/components/schemas/MessageContentDto"
+            }
+          }
+        }
+      },
+      "MessageContentDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The id of this message.",
+            "format": "int32"
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "The timestamp of when this message was sent."
+          },
+          "message": {
+            "type": "string",
+            "description": "The content of the message."
+          },
+          "userRole": {
+            "type": "integer",
+            "description": "The role of the user who sent this message.",
+            "format": "int32"
           }
         }
       },

@@ -51,6 +51,68 @@ namespace HomeServer.Database.Migrations
 
                     b.ToTable("Tasks");
                 });
+
+            modelBuilder.Entity("HomeServer.Database.MessageContent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("StoredChatHistoryId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StoredChatHistoryId");
+
+                    b.ToTable("MessageContent");
+                });
+
+            modelBuilder.Entity("HomeServer.Database.StoredChatHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("ChatHistories");
+                });
+
+            modelBuilder.Entity("HomeServer.Database.MessageContent", b =>
+                {
+                    b.HasOne("HomeServer.Database.StoredChatHistory", null)
+                        .WithMany("Messages")
+                        .HasForeignKey("StoredChatHistoryId");
+                });
+
+            modelBuilder.Entity("HomeServer.Database.StoredChatHistory", b =>
+                {
+                    b.Navigation("Messages");
+                });
 #pragma warning restore 612, 618
         }
     }
