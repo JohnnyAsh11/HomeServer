@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 
 using HomeServer.Database;
-using HomeServer.TodoList.Controllers;
+using HomeServer.Api.Controllers;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -11,8 +11,9 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
 using Serilog;
+using Microsoft.SemanticKernel;
 
-namespace HomeServer.TodoList
+namespace HomeServer.Api
 {
     public class Program
     {
@@ -49,6 +50,7 @@ namespace HomeServer.TodoList
             services.AddControllers();
             services.AddDbContext<HomeServerContext>();
             services.AddScoped<ITaskController, TodoController>();
+            services.AddScoped<IChatController, AiChatController>();
 
             // Open Telemetry
             OpenTelemetryBuilder otel = services.AddOpenTelemetry();
@@ -66,6 +68,10 @@ namespace HomeServer.TodoList
 
             // Server health.
             services.AddHealthChecks();
+
+            // Semantic Kernel Setup.
+            IKernelBuilder kernel = services.AddKernel();
+            services.AddOllamaChatCompletion("gemma3", new Uri("http://homeserver-ai:11434"));
 
             // Swagger
             // services.AddSwaggerGen();
