@@ -5,4 +5,4 @@
         ./Invoke-Redoc.ps1
 #>
 
-redocly build-docs HomeServer.OpenApi/openapi.yaml --output=HomeServer.TodoList/wwwroot/index.html
+redocly build-docs HomeServer.OpenApi/openapi.yaml --output=HomeServer.Api/wwwroot/index.html

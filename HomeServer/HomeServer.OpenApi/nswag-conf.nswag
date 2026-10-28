@@ -121,7 +121,7 @@
       "wrapResponseMethods": [],
       "generateResponseClasses": true,
       "responseClass": "SwaggerResponse",
-      "namespace": "HomeServer.TodoList",
+      "namespace": "HomeServer.Api",
       "requiredPropertiesMustBeDefined": true,
       "dateType": "System.DateTimeOffset",
       "jsonConverters": null,
@@ -155,7 +155,7 @@
       "templateDirectory": null,
       "serviceHost": null,
       "serviceSchemes": null,
-      "output": "../HomeServer.TodoList/Controllers.cs",
+      "output": "../HomeServer.Api/Controllers.cs",
       "newLineBehavior": "Auto"
     }
   }
