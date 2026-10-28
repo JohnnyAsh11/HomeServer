@@ -12,21 +12,21 @@ namespace HomeServer.Api.Controllers
     /// <summary>
     /// Accesses the data nested within the HomeServer task database.
     /// </summary>
-    /// <param name="DbContext"></param>
+    /// <param name="dbContext"></param>
     public class TodoController(
-        HomeServerContext DbContext,
-        ILogger<TodoController> Logger
+        HomeServerContext dbContext,
+        ILogger<TodoController> logger
     ) : ITaskController
     {
         /// <inheritdoc/>
         public async Task<IActionResult> DeleteTaskByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            Logger.LogInformation("DELETE task with ID ({id}) called.", id);
+            logger.LogInformation("DELETE task with ID ({id}) called.", id);
 
             try
             {
                 // Getting the specific task.
-                HomeServerTask? task = await DbContext.Tasks.FindAsync([id], cancellationToken);
+                HomeServerTask? task = await dbContext.Tasks.FindAsync([id], cancellationToken);
 
                 if (task is null)
                 {
@@ -34,32 +34,32 @@ namespace HomeServer.Api.Controllers
                 }
 
                 // Removing the task.
-                DbContext.Tasks.Remove(task);
-                await DbContext.SaveChangesAsync(cancellationToken);
+                dbContext.Tasks.Remove(task);
+                await dbContext.SaveChangesAsync(cancellationToken);
             }
             catch (OperationCanceledException cancelled)
             {
-                Logger.LogInformation("DELETE task by ID was cancelled: {message}", cancelled.Message);
+                logger.LogInformation("DELETE task by ID was cancelled: {message}", cancelled.Message);
             }
 
-            Logger.LogInformation("DELETE completed successfully.");
+            logger.LogInformation("DELETE completed successfully.");
             return new NoContentResult();
         }
 
         /// <inheritdoc/>
         public async Task<ActionResult<TaskInfoDto>> GetTaskByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            Logger.LogInformation("GET task with ID ({id}) called.", id);
+            logger.LogInformation("GET task with ID ({id}) called.", id);
             HomeServerTask? task = null;
 
             try
             {
                 // Getting the specific task.
-                task = await DbContext.Tasks.FindAsync([id], cancellationToken);
+                task = await dbContext.Tasks.FindAsync([id], cancellationToken);
             }
             catch (OperationCanceledException cancelled)
             {
-                Logger.LogInformation("GET task by ID was cancelled: {message}", cancelled.Message);
+                logger.LogInformation("GET task by ID was cancelled: {message}", cancelled.Message);
             }
 
             if (task is null)
@@ -67,39 +67,39 @@ namespace HomeServer.Api.Controllers
                 return new NotFoundResult();
             }
 
-            Logger.LogInformation("GET task by ID completed sucessfully.");
+            logger.LogInformation("GET task by ID completed sucessfully.");
             return new OkObjectResult(task.FromTask());
         }
 
         /// <inheritdoc/>
         public async Task<ActionResult<ICollection<TaskInfoDto>>> GetTasksAsync(CancellationToken cancellationToken = default)
         {
-            Logger.LogInformation("GET tasks called.");
+            logger.LogInformation("GET tasks called.");
             List<HomeServerTask> tasks = [];
 
             try
             {
                 // Getting every task in the database as a list.
-                tasks = await DbContext.Tasks.ToListAsync(cancellationToken);
+                tasks = await dbContext.Tasks.ToListAsync(cancellationToken);
             }
             catch (OperationCanceledException cancelled)
             {
-                Logger.LogInformation("GET tasks was cancelled: {message}", cancelled.Message);
+                logger.LogInformation("GET tasks was cancelled: {message}", cancelled.Message);
             }
 
             // Returning that data as transfer objects.
-            Logger.LogInformation("GET tasks completed sucessfully.");
+            logger.LogInformation("GET tasks completed sucessfully.");
             return new OkObjectResult(tasks.Select(task => task.FromTask()));
         }
 
         /// <inheritdoc/>
         public async Task<ActionResult<int>> PostTaskAsync(PostTaskInfoDto? body, CancellationToken cancellationToken = default)
         {
-            Logger.LogInformation("POST task called.");
+            logger.LogInformation("POST task called.");
 
             if (body is null)
             {
-                Logger.LogInformation("POST task failed: Bad Request.");
+                logger.LogInformation("POST task failed: Bad Request.");
                 return new BadRequestResult();
             }
 
@@ -108,36 +108,36 @@ namespace HomeServer.Api.Controllers
             try
             {
                 // Adding the new task and saving the changes.
-                await DbContext.Tasks.AddAsync(newTask, cancellationToken);
-                await DbContext.SaveChangesAsync(cancellationToken);
+                await dbContext.Tasks.AddAsync(newTask, cancellationToken);
+                await dbContext.SaveChangesAsync(cancellationToken);
             }
             catch (OperationCanceledException cancelled)
             {
-                Logger.LogInformation("POST task was cancelled: {message}", cancelled.Message);
+                logger.LogInformation("POST task was cancelled: {message}", cancelled.Message);
             }
 
-            Logger.LogInformation("POST task completed sucessfully.");
+            logger.LogInformation("POST task completed sucessfully.");
             return new OkObjectResult(newTask.Id);
         }
 
         /// <inheritdoc/>
         public async Task<ActionResult<TaskInfoDto>> PutTaskByIdAsync(int id, PutTaskInfoDto? body, CancellationToken cancellationToken = default)
         {
-            Logger.LogInformation("PUT task called on ID: {id}.", id);
+            logger.LogInformation("PUT task called on ID: {id}.", id);
 
             if (body is null)
             {
-                Logger.LogInformation("PUT task by ID failed: Bad Request.");
+                logger.LogInformation("PUT task by ID failed: Bad Request.");
                 return new BadRequestResult();
             }
 
             try
             {
-                HomeServerTask? resp = await DbContext.Tasks.FindAsync([id], cancellationToken);
+                HomeServerTask? resp = await dbContext.Tasks.FindAsync([id], cancellationToken);
 
                 if (resp is null)
                 {
-                    Logger.LogInformation("PUT task by ID failed: Not found.");
+                    logger.LogInformation("PUT task by ID failed: Not found.");
                     return new NotFoundResult();
                 }
 
@@ -173,11 +173,11 @@ namespace HomeServer.Api.Controllers
             }
             catch (OperationCanceledException cancelled)
             {
-                Logger.LogInformation("PUT task by ID was cancelled: {message}", cancelled.Message);
+                logger.LogInformation("PUT task by ID was cancelled: {message}", cancelled.Message);
             }
             
-            await DbContext.SaveChangesAsync(cancellationToken);            
-            Logger.LogInformation("PUT task by ID completed sucessfully.");
+            await dbContext.SaveChangesAsync(cancellationToken);            
+            logger.LogInformation("PUT task by ID completed sucessfully.");
             return new OkObjectResult(id);
         }
     }

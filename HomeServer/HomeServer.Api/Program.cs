@@ -51,6 +51,7 @@ namespace HomeServer.Api
             services.AddDbContext<HomeServerContext>();
             services.AddScoped<ITaskController, TodoController>();
             services.AddScoped<IChatController, AiChatController>();
+            services.AddSingleton<AiClientService>();
 
             // Open Telemetry
             OpenTelemetryBuilder otel = services.AddOpenTelemetry();
