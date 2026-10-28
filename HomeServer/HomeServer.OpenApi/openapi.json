@@ -432,6 +432,10 @@
             "type": "string",
             "description": "The name of the chat."
           },
+          "firstMessage": {
+            "type": "string",
+            "description": "The first message in the chat."
+          },
           "isDeleted": {
             "type": "boolean",
             "description": "Whether or not this chat is deleted."

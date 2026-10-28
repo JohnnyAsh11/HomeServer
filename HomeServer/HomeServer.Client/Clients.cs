@@ -1501,6 +1501,13 @@ namespace HomeServer.Client
         public string? Title { get; set; } = default!;
 
         /// <summary>
+        /// The first message in the chat.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("firstMessage")]
+        public string? FirstMessage { get; set; } = default!;
+
+        /// <summary>
         /// Whether or not this chat is deleted.
         /// </summary>
 
