@@ -12,77 +12,6 @@ using System.Threading.Tasks;
 
 namespace HomeServer.Api.Controllers
 {
-    /// <summary>
-    /// Provides extension methods for working with stored chat histories.
-    /// </summary>
-    public static class AiChatExtensions
-    {
-        public static ChatInfoDto ToChatInfo(this StoredChatHistory dbModel)
-        {
-            return new ChatInfoDto
-            {
-                Id = dbModel.Id,
-                Title = dbModel.Title,
-                IsDeleted = dbModel.IsDeleted
-            };
-        }
-
-        public static MessageContentDto ToMessageContentDto(this MessageContent message)
-        {
-            return new MessageContentDto
-            {
-                Timestamp = message.Timestamp.ToString(),
-                Message = message.Message,
-                UserRole = (int)message.Role
-            };
-        }
-
-        public static MessageContent ToMessageContent(this MessageContentDto dto)
-        {
-            // Setting a default User Role if null.
-            if (dto.UserRole is null)
-            {
-                dto.UserRole = (int)ChatMessageRole.User;
-            }
-
-            // Setting a default date time if null.
-            if (dto.Timestamp is null)
-            {
-                dto.Timestamp = DateTime.MinValue.ToString();
-            }
-
-            return new MessageContent
-            {
-                Message = dto.Message ?? string.Empty,
-                Role = (ChatMessageRole)dto.UserRole,
-                Timestamp = DateTime.Parse(dto.Timestamp)
-            };
-        }
-
-        public static ChatHistory ToChatHistory(this List<MessageContent> messages)
-        {
-            ChatHistory history = [];
-            foreach (MessageContent message in messages)
-            {
-                Microsoft.SemanticKernel.ChatMessageContent content = new(message.Role.ToChatRole(), message.Message);
-                history.Add(content);
-            }
-            return history;
-        }
-
-        public static AuthorRole ToChatRole(this ChatMessageRole role)
-        {
-            return role switch
-            {
-                ChatMessageRole.System => AuthorRole.System,
-                ChatMessageRole.User => AuthorRole.User,
-                ChatMessageRole.Assistant => AuthorRole.Assistant,
-                ChatMessageRole.Tool => AuthorRole.Tool,
-                _ => throw new ArgumentOutOfRangeException(nameof(role), role, null)
-            };
-        }
-    }
-
     public class AiChatController(
         HomeServerContext dbContext,
         HangfireManager hangfire,
@@ -255,6 +184,77 @@ namespace HomeServer.Api.Controllers
             };
 
             return new OkObjectResult(response);
+        }
+    }
+
+    /// <summary>
+    /// Provides extension methods for working with stored chat histories.
+    /// </summary>
+    public static class AiChatExtensions
+    {
+        public static ChatInfoDto ToChatInfo(this StoredChatHistory dbModel)
+        {
+            return new ChatInfoDto
+            {
+                Id = dbModel.Id,
+                Title = dbModel.Title,
+                IsDeleted = dbModel.IsDeleted
+            };
+        }
+
+        public static MessageContentDto ToMessageContentDto(this MessageContent message)
+        {
+            return new MessageContentDto
+            {
+                Timestamp = message.Timestamp.ToString(),
+                Message = message.Message,
+                UserRole = (int)message.Role
+            };
+        }
+
+        public static MessageContent ToMessageContent(this MessageContentDto dto)
+        {
+            // Setting a default User Role if null.
+            if (dto.UserRole is null)
+            {
+                dto.UserRole = (int)ChatMessageRole.User;
+            }
+
+            // Setting a default date time if null.
+            if (dto.Timestamp is null)
+            {
+                dto.Timestamp = DateTime.MinValue.ToString();
+            }
+
+            return new MessageContent
+            {
+                Message = dto.Message ?? string.Empty,
+                Role = (ChatMessageRole)dto.UserRole,
+                Timestamp = DateTime.Parse(dto.Timestamp)
+            };
+        }
+
+        public static ChatHistory ToChatHistory(this List<MessageContent> messages)
+        {
+            ChatHistory history = [];
+            foreach (MessageContent message in messages)
+            {
+                Microsoft.SemanticKernel.ChatMessageContent content = new(message.Role.ToChatRole(), message.Message);
+                history.Add(content);
+            }
+            return history;
+        }
+
+        public static AuthorRole ToChatRole(this ChatMessageRole role)
+        {
+            return role switch
+            {
+                ChatMessageRole.System => AuthorRole.System,
+                ChatMessageRole.User => AuthorRole.User,
+                ChatMessageRole.Assistant => AuthorRole.Assistant,
+                ChatMessageRole.Tool => AuthorRole.Tool,
+                _ => throw new ArgumentOutOfRangeException(nameof(role), role, null)
+            };
         }
     }
 }
