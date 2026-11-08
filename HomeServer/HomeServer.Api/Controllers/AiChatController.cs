@@ -85,11 +85,9 @@ namespace HomeServer.Api.Controllers
 
     public class AiChatController(
         HomeServerContext dbContext,
-        AiClientService aiController,
+        HangfireManager hangfire,
         ILogger<AiChatController> logger) : IChatController
     {
-        private PromptExecutionSettings _settings = new() { };
-
         /// <inheritdoc/>
         public async Task<ActionResult<ICollection<ChatInfoDto>>> GetAiChatsAsync(CancellationToken cancellationToken = default)
         {
@@ -138,31 +136,23 @@ namespace HomeServer.Api.Controllers
                 Timestamp = DateTime.Now
             });
 
-            // The first response from the AI.
-            string? firstResponse = await aiController.GetChatResponse(messages.ToChatHistory());
-            messages.Add(new MessageContent()
-            {
-                Message = firstResponse ?? string.Empty,
-                Role = ChatMessageRole.Assistant,
-                Timestamp = DateTime.Now
-            });
-
             // Building the ChatHistory object & adding it to the database.
             StoredChatHistory newChat = new()
             {
-                Title = await aiController.GenerateChatTitle(body.FirstMessage),
+                Title = string.Empty,
                 IsDeleted = false,
                 Messages = messages,
                 StartDate = DateTime.Now
             };
 
-            foreach (MessageContent message in newChat.Messages)
-            {
-                logger.LogInformation($"{message.Role.ToString()}: {message.Message}");
-            }
-
             await dbContext.ChatHistories.AddAsync(newChat, cancellationToken);
             await dbContext.SaveChangesAsync(cancellationToken);
+
+            // Once added to the database, enqueuing first AI interactions:
+            // NOTE: Not awaiting these calls, they should be disconnected from the main thread.
+            _ = Task.Run(() => hangfire.EnqueueChatRequest(messages, newChat.Id), cancellationToken);
+            _ = Task.Run(() => hangfire.EnqueueChatTitleRequest(body.FirstMessage, newChat.Id), cancellationToken);
+
             return new OkObjectResult(newChat.Id);
         }
 
@@ -225,19 +215,11 @@ namespace HomeServer.Api.Controllers
             // Adding the new user message (http request body) to the chat history.
             MessageContent newMessage = body.ToMessageContent();
             chat.Messages.Add(newMessage);
+            await dbContext.SaveChangesAsync(cancellationToken);
 
             // Get the AI response to the new message.
-            string? response = await aiController.GetChatResponse(chat.Messages.ToChatHistory());
+            _ = Task.Run(() => hangfire.EnqueueChatRequest(chat.Messages, chat.Id));
 
-            // Adding the AI response to the chat history.
-            chat.Messages.Add(new MessageContent()
-            {
-                Message = response ?? string.Empty,
-                Role = ChatMessageRole.Assistant,
-                Timestamp = DateTime.Now
-            });
-
-            await dbContext.SaveChangesAsync(cancellationToken);
             return new OkObjectResult(chat.Id);
         }
 
@@ -255,12 +237,12 @@ namespace HomeServer.Api.Controllers
             }
             catch (Exception err)
             {
-                logger.LogInformation("POST message to chat by ID was cancelled or not found: {message}", err.Message);
+                logger.LogInformation("GET message to chat by ID was cancelled or not found: {message}", err.Message);
             }
 
             if (chat is null)
             {
-                logger.LogInformation("POST message to chat by ID was not found");
+                logger.LogInformation("GET message to chat by ID was not found");
                 return new NotFoundResult();
             }
 

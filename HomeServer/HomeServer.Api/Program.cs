@@ -25,6 +25,18 @@ namespace HomeServer.Api
                 .ReadFrom.Configuration(builder.Configuration));
 
             WebApplication app = builder.Build();
+            app.Use((context, next) =>
+            {
+                if (string.Equals(
+                    context.Request.Headers["X-Forwarded-Prefix"].ToString(),
+                    "/api",
+                    StringComparison.Ordinal))
+                {
+                    context.Request.PathBase = "/api";
+                }
+
+                return next();
+            });
             app.UseHangfireDashboard("/hangfire", new DashboardOptions()
             {
                 Authorization = [new AllowAllDashboardAuthFilter()],
@@ -54,9 +66,12 @@ namespace HomeServer.Api
             services.AddEndpointsApiExplorer();
             services.AddControllers();
             services.AddDbContext<HomeServerContext>();
+            services.AddSingleton<AiClientService>();
+            services.AddSingleton<HangfireManager>();
+
+            // API Endpoint Controllers:
             services.AddScoped<ITaskController, TodoController>();
             services.AddScoped<IChatController, AiChatController>();
-            services.AddSingleton<AiClientService>();
 
             // Hangfire configuration:
             services.AddHangfire(configuration => configuration
