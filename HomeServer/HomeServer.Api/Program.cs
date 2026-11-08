@@ -1,17 +1,17 @@
-using System.Threading.Tasks;
-
-using HomeServer.Database;
+using Hangfire;
+using Hangfire.Dashboard;
 using HomeServer.Api.Controllers;
-
-using Microsoft.EntityFrameworkCore;
+using HomeServer.Database;
 using Microsoft.AspNetCore.Mvc.Formatters;
-
+using Microsoft.EntityFrameworkCore;
+using Microsoft.SemanticKernel;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
-
 using Serilog;
-using Microsoft.SemanticKernel;
+using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
+using Hangfire.MemoryStorage;
 
 namespace HomeServer.Api
 {
@@ -25,6 +25,11 @@ namespace HomeServer.Api
                 .ReadFrom.Configuration(builder.Configuration));
 
             WebApplication app = builder.Build();
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions()
+            {
+                Authorization = [new AllowAllDashboardAuthFilter()],
+                IgnoreAntiforgeryToken = true,
+            });
 
             // app.UsePathBase("/api");
             app.UseHttpsRedirection();
@@ -53,6 +58,14 @@ namespace HomeServer.Api
             services.AddScoped<IChatController, AiChatController>();
             services.AddSingleton<AiClientService>();
 
+            // Hangfire configuration:
+            services.AddHangfire(configuration => configuration
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseMemoryStorage());
+            services.AddHangfireServer();
+
             // Open Telemetry
             OpenTelemetryBuilder otel = services.AddOpenTelemetry();
             services.AddLogging(logger => logger.AddOpenTelemetry(config =>
@@ -76,6 +89,20 @@ namespace HomeServer.Api
 
             // Swagger
             // services.AddSwaggerGen();
+        }
+
+        /// <summary>
+        /// Allows anyone access into the Hangfire dashboard.
+        /// This is ok since it is an internal tool only accessible
+        /// to me and those I provide permissions to through TailScale.
+        /// </summary>
+        internal class AllowAllDashboardAuthFilter : IDashboardAuthorizationFilter
+        {
+            public bool Authorize(DashboardContext context)
+            {
+                // Allow all users to access the dashboard
+                return true;
+            }
         }
     }
 }
