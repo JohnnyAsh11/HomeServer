@@ -1,12 +1,13 @@
-﻿using Microsoft.Extensions.AI;
+using Microsoft.Extensions.AI;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HomeServer.Api
 {
-    internal sealed record TitleOutput(string Title);
+    internal sealed record TitleOutput([property: JsonPropertyName("title")] string Title);
 
     /// <summary>
     /// Manages interactions with the AI model.
@@ -28,40 +29,36 @@ namespace HomeServer.Api
         /// </summary>
         public async Task<string> GenerateChatTitle(string firstMessage)
         {
-            // Creating the schema for output from the AI model.
-            JsonElement outputSchema = JsonSerializer.SerializeToElement(new
-            {
-                type = "object",
-                properties = new
-                {
-                    title = new { type = "string" }
-                },
-                required = new[] { "title" },
-                additionalProperties = false
-            });
+            string prompt =
+                $"""
+                Generate a concise title for a chat whose first message is below.
+                {firstMessage}
+                """;
 
-            // Creating the prompt for the AI model.
-            ChatMessage message = new(
-                ChatRole.User,
-                $"Generate a title for a chat with the following first message: {firstMessage}");
-
-            // Passing the prompt through to the AI model.
+            // Sending the prompt as a message to the AI to respond with structured JSON output.
+            ChatMessage message = new(ChatRole.User, prompt);
             ChatResponse response = await aiClient.AsChatClient().GetResponseAsync(message, new ChatOptions
             {
-                ResponseFormat = ChatResponseFormatJson.ForJsonSchema(outputSchema, "chat_title", ""),
+                // Setting up the structured output format.
+                ResponseFormat = ChatResponseFormat.ForJsonSchema<TitleOutput>(
+                    JsonSerializerOptions.Web,
+                    "chat_title",
+                    "A concise title for the chat")
             });
 
-            if (response is null)
+            // Parsing the output to extract the title.
+            TitleOutput? output = string.IsNullOrWhiteSpace(response.Text)
+                ? null
+                : JsonSerializer.Deserialize<TitleOutput>(response.Text, JsonSerializerOptions.Web);
+
+            // Returning the title or a default value if parsing failed.
+            string? title = output?.Title?.Trim();
+            if (string.IsNullOrWhiteSpace(title))
             {
                 logger.LogWarning("No title could be generated for this chat.");
                 return string.Empty;
             }
-
-            // Deserializing the response from the AI model into a TitleOutput object.
-            TitleOutput? title = JsonSerializer.Deserialize<TitleOutput>(response.Text);
-
-            // Returning the title if it was successfully generated, or an empty string if not.
-            return title?.Title ?? string.Empty;
+            return title;
         }
 
         /// <summary>
