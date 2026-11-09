@@ -1,0 +1,58 @@
+﻿@page "/"
+@inject HomeServerClient Client;
+@inject IDialogService DialogService;
+@inject ISnackbar Snackbar;
+@inject ILogger<AiAssistant> Logger;
+
+<PageTitle>AI Assistant</PageTitle>
+
+<MudGrid>
+
+    <MudItem xs="10">
+        <MudText style="margin: 30px; font-size: 2rem;"
+                 Class="pa-4">
+            Caide AI Assistant
+        </MudText>
+    </MudItem>
+
+    <MudItem xs="12">
+        <MudDataGrid T="ChatModel" Items="_chats" Loading="false">
+            <Columns>
+                <PropertyColumn Property="x => x.Id" Title="Id" HeaderStyle="width:25px" />
+                <PropertyColumn Property="x => x.Title" Title="Title" HeaderStyle="width:200px" />
+            </Columns>
+        </MudDataGrid>
+    </MudItem>
+
+</MudGrid>
+
+@code {
+    public record ChatModel(
+        int Id,
+        string Title,
+        bool IsDeleted);
+    private IEnumerable<ChatModel> _chats = [];
+
+    /// <inheritdoc/>
+    protected override async Task OnInitializedAsync()
+    {
+        await ReloadDataAsync();
+    }
+
+    private async Task ReloadDataAsync()
+    {
+        // Getting all of the chats.
+        ICollection<ChatInfoDto> chatData = await Client.Chat.GetAiChatsAsync();
+
+        // Converting them to the view model.
+        _chats = chatData.Select(chat => ToViewModel(chat));
+    }
+
+    public ChatModel ToViewModel(ChatInfoDto dto)
+    {
+        return new ChatModel(
+            dto.Id ?? 0,
+            dto.Title ?? string.Empty,
+            dto.IsDeleted ?? true);
+    }
+}
