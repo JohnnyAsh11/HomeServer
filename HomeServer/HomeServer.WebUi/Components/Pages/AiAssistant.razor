@@ -8,29 +8,72 @@
 
 <MudGrid>
 
-    <MudItem xs="10">
+    <MudItem xs="12">
         <MudText style="margin: 30px; font-size: 2rem;"
                  Class="pa-4">
             Caide AI Assistant
         </MudText>
     </MudItem>
 
-    <MudItem xs="12">
+    @* Displays all of the past chats. *@
+    <MudItem xs="3">
         <MudDataGrid T="ChatModel" Items="_chats" Loading="false">
             <Columns>
                 <PropertyColumn Property="x => x.Id" Title="Id" HeaderStyle="width:25px" />
                 <PropertyColumn Property="x => x.Title" Title="Title" HeaderStyle="width:200px" />
+                <PropertyColumn Property="x => x.Title" Title="" HeaderStyle="width:50px">
+                    <CellTemplate>
+                        <MudIconButton Icon="@Icons.Material.Filled.SubdirectoryArrowRight"
+                                       aria-label="select"
+                                       OnClick="() => SelectChat(context.Item.Id)"
+                                       Disabled="context.Item.IsSelected"/>
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.IsDeleted" Title="" HeaderStyle="width:50px" >
+                    <CellTemplate>
+                        <MudIconButton Icon="@Icons.Material.Outlined.Delete" 
+                                       aria-label="delete" 
+                                       OnClick="() => DeleteChat(context.Item.Id)" />
+                    </CellTemplate>
+                </PropertyColumn>
             </Columns>
         </MudDataGrid>
+    </MudItem>
+    
+    <MudItem xs="9">
+        <MudGrid>
+            @* The chat view area. *@
+            <MudItem xs="12">
+                <MudTable T="string" Items="@_messages" Hover="true" Breakpoint="Breakpoint.Sm">
+                    <RowTemplate>
+                        <MudTd DataLabel="Messages">@context</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudItem>
+
+            @* The message entry field. *@
+            <MudItem xs="12">
+                <MudTextField @bind-Value="Prompt" 
+                    Label="Prompt" 
+                    Variant="Variant.Outlined" 
+                    InputType="@TextInput"
+                    Adornment="Adornment.End" 
+                    AdornmentIcon="@Icons.Material.Filled.ArrowForward"
+                    OnAdornmentClick="PostMessageToChat"
+                    AdornmentAriaLabel="Send Prompt" />
+
+            </MudItem>
+        </MudGrid>
     </MudItem>
 
 </MudGrid>
 
 @code {
-    public record ChatModel(
-        int Id,
-        string Title,
-        bool IsDeleted);
+    public string Prompt { get; set; } = string.Empty;
+    private const InputType TextInput = InputType.Text;
+    private ChatModel? selectedChat = null;
+
+    public IEnumerable<string> _messages = [];
     private IEnumerable<ChatModel> _chats = [];
 
     /// <inheritdoc/>
@@ -44,8 +87,108 @@
         // Getting all of the chats.
         ICollection<ChatInfoDto> chatData = await Client.Chat.GetAiChatsAsync();
 
-        // Converting them to the view model.
-        _chats = chatData.Select(chat => ToViewModel(chat));
+        // Converting them to the view model & ensuring no deleted chats are displayed.
+        _chats = chatData
+            .Select(chat => ToViewModel(chat))
+            .Where(chat => !chat.IsDeleted);
+
+        // Maintain the same selected chat.
+        ChatModel? selected = _chats.FirstOrDefault(chat => chat.Id == selectedChat?.Id);
+        if (selected is null)
+        {
+            _messages = [];
+            return;
+        }
+
+        selectedChat = selected;
+        ChatContentDto chatContent = await Client.Chat.GetAiChatByIdAsync(selectedChat.Id);
+
+        if (chatContent.Messages is null)
+        {
+            _messages = [];
+            return;
+        }
+
+        _messages = chatContent.Messages.Select(content => content.Message ?? string.Empty);
+    }
+
+    private async Task DeleteChat(int id)
+    {
+        // TODO: Handle gracefully it deleted chat is selected chat.
+        await Client.Chat.DeleteAiChatByIdAsync(id);
+        await ReloadDataAsync();
+    }
+
+    private async Task SelectChat(int id)
+    {
+        // Getting the target chat.
+        ChatModel? chat = _chats.FirstOrDefault(chat => chat.Id == id);
+        if (chat is null)
+        {
+            Logger.LogWarning("Could not find/select chat with ID: {id}", id);
+            return;
+        }
+
+        // Unselect all chats.
+        foreach (ChatModel model in _chats)
+        {
+            model.IsSelected = false;
+        }
+
+        // Select the target chat.
+        chat.IsSelected = true;
+        selectedChat = chat;
+        await ReloadDataAsync();
+    }
+
+    private async Task PostMessageToChat()
+    {
+        if (selectedChat is null)
+        {
+            // This is a new chat, create a new chat.
+            ChatInfoDto newChatDto = new()
+            {
+                FirstMessage = Prompt
+            };
+
+            // Creating the chat and reloading the data.
+            int respId = await Client.Chat.PostAiChatAsync(newChatDto);
+            await ReloadDataAsync();
+
+            // Looking for the new chat in the loaded data.
+            ChatModel? newChat = _chats.FirstOrDefault(chat => chat.Id == respId);
+            if (newChat is null)
+            {
+                Logger.LogWarning("Unable to find newly posted chat.");
+                return;
+            }
+
+            // Selecting the new chat.
+            newChat.IsSelected = true;
+            selectedChat = newChat;
+        }
+        else
+        {
+            // If not a new chat, post the message to the chat.
+            MessageContentDto dto = new()
+            {
+                Id = selectedChat.Id,
+                Message = Prompt,
+                Timestamp = DateTime.Now.ToString(),
+                UserRole = 1 // Assuming 1 represents the user role.
+            };
+
+            try
+            {
+                await Client.Chat.PostMessageToAiChatByIdAsync(selectedChat.Id, dto);
+                Snackbar.Add("Message sent successfully.", Severity.Success);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error sending message to chat.");
+                Snackbar.Add("Failed to send message.", Severity.Error);
+            }
+        }
     }
 
     public ChatModel ToViewModel(ChatInfoDto dto)
@@ -53,6 +196,7 @@
         return new ChatModel(
             dto.Id ?? 0,
             dto.Title ?? string.Empty,
-            dto.IsDeleted ?? true);
+            dto.IsDeleted ?? true,
+            false);
     }
 }
