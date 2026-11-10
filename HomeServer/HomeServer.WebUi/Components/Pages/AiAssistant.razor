@@ -9,10 +9,26 @@
 <MudGrid>
 
     <MudItem xs="12">
-        <MudText style="margin: 30px; font-size: 2rem;"
-                 Class="pa-4">
-            Caide AI Assistant
-        </MudText>
+        <MudStack>
+            <MudPaper>
+                <MudText style="margin: 30px; font-size: 2rem;"
+                         Class="pa-4">
+                    Caide AI Assistant
+                </MudText>
+            </MudPaper>
+
+            <MudPaper>
+                <MudButton style="margin: 30px;"
+                           Class="pa-4"
+                           StartIcon="@Icons.Material.Filled.Add"
+                           Variant="Variant.Outlined"
+                           aria-label="select"
+                           OnClick="() => CreateNewChat()"
+                           Color="Color.Success">
+                    Start New Chat
+                </MudButton>
+            </MudPaper>
+        </MudStack>
     </MudItem>
 
     @* Displays all of the past chats. *@
@@ -26,14 +42,16 @@
                         <MudIconButton Icon="@Icons.Material.Filled.SubdirectoryArrowRight"
                                        aria-label="select"
                                        OnClick="() => SelectChat(context.Item.Id)"
-                                       Disabled="context.Item.IsSelected"/>
+                                       Disabled="context.Item.IsSelected"
+                                       Color="Color.Primary" />
                     </CellTemplate>
                 </PropertyColumn>
                 <PropertyColumn Property="x => x.IsDeleted" Title="" HeaderStyle="width:50px" >
                     <CellTemplate>
                         <MudIconButton Icon="@Icons.Material.Outlined.Delete" 
                                        aria-label="delete" 
-                                       OnClick="() => DeleteChat(context.Item.Id)" />
+                                       OnClick="() => DeleteChat(context.Item.Id)"
+                                       Color="Color.Error" />
                     </CellTemplate>
                 </PropertyColumn>
             </Columns>
@@ -188,6 +206,17 @@
                 Logger.LogError(ex, "Error sending message to chat.");
                 Snackbar.Add("Failed to send message.", Severity.Error);
             }
+        }
+    }
+
+    private async Task CreateNewChat()
+    {
+        selectedChat = null;
+        _messages = [];
+
+        foreach(ChatModel chat in _chats)
+        {
+            chat.IsSelected = false;
         }
     }
 
