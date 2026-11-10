@@ -34,7 +34,7 @@ paths:
             schema:
               $ref: "#/components/schemas/ChatInfoDto"
       responses:
-        '202':
+        '201':
           description: Created chat.
           content:
             application/json:
@@ -95,7 +95,7 @@ paths:
             schema:
               $ref: "#/components/schemas/MessageContentDto"
       responses:
-        '202':
+        '201':
           description: Created message.
           content:
             application/json:

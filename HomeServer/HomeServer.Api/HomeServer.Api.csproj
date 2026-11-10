@@ -30,4 +30,7 @@
   <ItemGroup>
     <ProjectReference Include="..\HomeServer.Database\HomeServer.Database.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
 </Project>

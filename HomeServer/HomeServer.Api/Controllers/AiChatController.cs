@@ -1,9 +1,11 @@
 using HomeServer.Database;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.AI;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
+using OllamaSharp;
 using OpenAI.Chat;
 using System;
 using System.Collections.Generic;
@@ -82,7 +84,11 @@ namespace HomeServer.Api.Controllers
             _ = Task.Run(() => hangfire.EnqueueChatRequest(messages, newChat.Id), cancellationToken);
             _ = Task.Run(() => hangfire.EnqueueChatTitleRequest(body.FirstMessage, newChat.Id), cancellationToken);
 
-            return new OkObjectResult(newChat.Id);
+            return new CreatedAtActionResult(
+                nameof(PostAiChatAsync), 
+                nameof(AiChatController), 
+                newChat.Id,
+                null);
         }
 
         /// <inheritdoc/>
@@ -149,7 +155,11 @@ namespace HomeServer.Api.Controllers
             // Get the AI response to the new message.
             _ = Task.Run(() => hangfire.EnqueueChatRequest(chat.Messages, chat.Id));
 
-            return new OkObjectResult(chat.Id);
+            return new CreatedAtActionResult(
+                nameof(PostAiChatAsync),
+                nameof(AiChatController),
+                chat.Id,
+                null);
         }
 
         /// <inheritdoc/>
