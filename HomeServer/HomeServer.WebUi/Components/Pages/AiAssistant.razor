@@ -169,9 +169,18 @@
                 FirstMessage = Prompt
             };
 
-            // Creating the chat and reloading the data.
-            int respId = await Client.Chat.PostAiChatAsync(newChatDto);
-            await ReloadDataAsync();
+            int respId = -1;
+            try
+            {
+                // Creating the chat and reloading the data.
+                respId = await Client.Chat.PostAiChatAsync(newChatDto);
+                Snackbar.Add("Message sent successfully.", Severity.Success);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error sending message to chat.");
+                Snackbar.Add("Failed to send message.", Severity.Error);
+            }
 
             // Looking for the new chat in the loaded data.
             ChatModel? newChat = _chats.FirstOrDefault(chat => chat.Id == respId);
@@ -184,6 +193,8 @@
             // Selecting the new chat.
             newChat.IsSelected = true;
             selectedChat = newChat;
+            Prompt = string.Empty;
+            await ReloadDataAsync();
         }
         else
         {
@@ -199,6 +210,7 @@
             try
             {
                 await Client.Chat.PostMessageToAiChatByIdAsync(selectedChat.Id, dto);
+                Prompt = string.Empty;
                 Snackbar.Add("Message sent successfully.", Severity.Success);
             }
             catch (Exception ex)
@@ -206,6 +218,8 @@
                 Logger.LogError(ex, "Error sending message to chat.");
                 Snackbar.Add("Failed to send message.", Severity.Error);
             }
+
+            await ReloadDataAsync();
         }
     }
 

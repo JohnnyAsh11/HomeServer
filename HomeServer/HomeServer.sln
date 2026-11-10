@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Compose-Up.ps1 = Compose-Up.ps1
 		docker-compose.yml = docker-compose.yml
 		HomeServer.App\HomeServer.App.csproj = HomeServer.App\HomeServer.App.csproj
+		RegenerateDocs.ps1 = RegenerateDocs.ps1
+		RegenerateEndpoints.ps1 = RegenerateEndpoints.ps1
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeServer.OpenApi", "HomeServer.OpenApi\HomeServer.OpenApi.csproj", "{177C79D0-8A64-4F8E-A564-20A4819EAC8C}"

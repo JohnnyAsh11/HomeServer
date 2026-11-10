@@ -1,7 +1,27 @@
 ﻿
+@inject NavigationManager Navigation
+
 <MudNavMenu>
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Assistant">AI</MudNavLink>
     <MudNavLink Href="TodoList" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Checklist">Task Tracker</MudNavLink>
     <MudNavLink Href="/api/hangfire" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Pattern">Hangfire</MudNavLink>
-
+    <MudNavLink Href="https://racinggods.live" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.SportsMotorsports">RacingGods</MudNavLink>
+    <MudNavLink Href="@FinanceUrl" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.AttachMoney">Finances</MudNavLink>
 </MudNavMenu>
+
+@code {
+    private string FinanceUrl
+    {
+        get
+        {
+            UriBuilder uriBuilder = new UriBuilder(Navigation.BaseUri)
+            {
+                Scheme = Uri.UriSchemeHttp,
+                Port = 5006,
+                Path = "/"
+            };
+
+            return uriBuilder.Uri.AbsoluteUri;
+        }
+    }
+}

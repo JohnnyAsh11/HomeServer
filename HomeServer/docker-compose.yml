@@ -78,7 +78,17 @@ services:
     environment:
       ASPNETCORE_URLS: "http://+:80"
 
-  # MARK: OLLAMA
+  # MARK: FINANCE TOOL
+  homeserver-finances:
+    image: actualbudget/actual-server
+    networks:
+      - homeserver-network
+    ports:
+      - "5006:5006"
+    volumes:
+      - "./HomeServer.Data/ActualBudgetData:/data"
+
+  # MARK: AI OLLAMA
   homeserver-ai:
     networks:
       - homeserver-network
