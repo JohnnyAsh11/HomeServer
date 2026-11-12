@@ -85,10 +85,10 @@ namespace HomeServer.Api.Controllers
             _ = Task.Run(() => hangfire.EnqueueChatTitleRequest(body.FirstMessage, newChat.Id), cancellationToken);
 
             return new CreatedAtActionResult(
-                nameof(PostAiChatAsync), 
-                nameof(AiChatController), 
-                newChat.Id,
-                null);
+                "GetAiChatById",
+                "Chat",
+                new { id = newChat.Id },
+                newChat.Id);
         }
 
         /// <inheritdoc/>
@@ -156,10 +156,10 @@ namespace HomeServer.Api.Controllers
             _ = Task.Run(() => hangfire.EnqueueChatRequest(chat.Messages, chat.Id));
 
             return new CreatedAtActionResult(
-                nameof(PostAiChatAsync),
-                nameof(AiChatController),
-                chat.Id,
-                null);
+                "GetAiChatById",
+                "Chat",
+                new { id = chat.Id },
+                chat.Id);
         }
 
         /// <inheritdoc/>
