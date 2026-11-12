@@ -127,7 +127,9 @@
             return;
         }
 
-        _messages = chatContent.Messages.Select(content => content.Message ?? string.Empty);
+        _messages = chatContent.Messages
+            .Where(content => content.UserRole != 0)
+            .Select(content => content.Message ?? string.Empty);
     }
 
     private async Task DeleteChat(int id)
@@ -169,26 +171,30 @@
                 FirstMessage = Prompt
             };
 
-            int respId = -1;
+            int respId;
             try
             {
-                // Creating the chat and reloading the data.
+                // Creating the chat.
                 respId = await Client.Chat.PostAiChatAsync(newChatDto);
-                Snackbar.Add("Message sent successfully.", Severity.Success);
             }
             catch (Exception ex)
             {
                 Logger.LogError(ex, "Error sending message to chat.");
                 Snackbar.Add("Failed to send message.", Severity.Error);
+                return;
             }
 
-            // Looking for the new chat in the loaded data.
+            // Reload the list before looking up the newly created chat.
+            await ReloadDataAsync();
             ChatModel? newChat = _chats.FirstOrDefault(chat => chat.Id == respId);
             if (newChat is null)
             {
                 Logger.LogWarning("Unable to find newly posted chat.");
+                Snackbar.Add("Chat was created, but could not be loaded.", Severity.Error);
                 return;
             }
+
+            Snackbar.Add("Message sent successfully.", Severity.Success);
 
             // Selecting the new chat.
             newChat.IsSelected = true;
