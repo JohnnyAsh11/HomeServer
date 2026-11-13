@@ -43,6 +43,11 @@
             Logger.LogWarning("Could not find/select chat with ID: {id}", id);
         }
 
+        List<string> messages = chat?.Messages?
+            .Where(content => content.UserRole != 0)
+            .Select(content => content.Message ?? string.Empty)
+            .ToList() ?? [];
+
         DialogOptions options = new DialogOptions 
         { 
             CloseOnEscapeKey = true, 
@@ -50,7 +55,7 @@
         };
         DialogParameters parameters = new()
         {
-            { "Messages", chat?.Messages?.Select(content => content.Message).ToList() }
+            { "Messages", messages }
         };
 
         IDialogReference dialog = await DialogService.ShowAsync<ViewChatDialog>(
