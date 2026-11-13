@@ -8,6 +8,7 @@
     <MudNavLink Href="https://racinggods.live" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.SportsMotorsports">RacingGods</MudNavLink>
     <MudNavLink Href="@FinanceUrl" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.AttachMoney">Finances</MudNavLink>
     <MudNavLink Href="index.html" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.MenuBook">API Docs</MudNavLink>
+    <MudNavLink Href="@TraefikUrl" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Traffic">Traefik</MudNavLink>
 </MudNavMenu>
 
 @code {
@@ -15,10 +16,25 @@
     {
         get
         {
-            UriBuilder uriBuilder = new UriBuilder(Navigation.BaseUri)
+            UriBuilder uriBuilder = new(Navigation.BaseUri)
             {
                 Scheme = Uri.UriSchemeHttp,
                 Port = 5006,
+                Path = "/"
+            };
+
+            return uriBuilder.Uri.AbsoluteUri;
+        }
+    }
+
+    private string TraefikUrl
+    {
+        get
+        {
+            UriBuilder uriBuilder = new(Navigation.BaseUri)
+            {
+                Scheme = Uri.UriSchemeHttp,
+                Port = 8080,
                 Path = "/"
             };
 

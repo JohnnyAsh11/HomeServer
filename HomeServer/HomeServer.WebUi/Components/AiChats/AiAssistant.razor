@@ -3,32 +3,41 @@
 @inject IDialogService DialogService;
 @inject ISnackbar Snackbar;
 @inject ILogger<AiAssistant> Logger;
+@implements IAsyncDisposable
 
 <PageTitle>AI Assistant</PageTitle>
 
 <MudGrid>
-
     <MudItem xs="12">
-        <MudStack>
-            <MudPaper>
-                <MudText style="margin: 30px; font-size: 2rem;"
-                         Class="pa-4">
-                    Caide AI Assistant
-                </MudText>
-            </MudPaper>
+        <MudPaper>
+            @* Header for the AI assistant page *@
+            <MudText style="margin: 30px; font-size: 2rem;"
+                        Class="pa-4">
+                AI Assistant
+            </MudText>
 
-            <MudPaper>
-                <MudButton style="margin: 30px;"
-                           Class="pa-4"
-                           StartIcon="@Icons.Material.Filled.Add"
-                           Variant="Variant.Outlined"
-                           aria-label="select"
-                           OnClick="() => CreateNewChat()"
-                           Color="Color.Success">
-                    Start New Chat
-                </MudButton>
-            </MudPaper>
-        </MudStack>
+            @* Readies a new chat for the user to send messages to the AI assistant. *@
+            <MudButton style="margin: 30px;"
+                        Class="pa-4"
+                        StartIcon="@Icons.Material.Filled.Add"
+                        Variant="Variant.Outlined"
+                        aria-label="select"
+                        OnClick="() => CreateNewChat()"
+                        Color="Color.Success">
+                Start New Chat
+            </MudButton>
+
+            @* Opens a dialog to show the user all of their deleted chats. *@
+            <MudButton style="margin: 30px;"
+                        Class="pa-4"
+                        StartIcon="@Icons.Material.Filled.Folder"
+                        Variant="Variant.Outlined"
+                        aria-label="select"
+                        OnClick="() => ViewArchive()"
+                        Color="Color.Secondary">
+                Archive
+            </MudButton>
+        </MudPaper>
     </MudItem>
 
     @* Displays all of the past chats. *@
@@ -37,7 +46,7 @@
             <Columns>
                 <PropertyColumn Property="x => x.Id" Title="Id" HeaderStyle="width:25px" />
                 <PropertyColumn Property="x => x.Title" Title="Title" HeaderStyle="width:200px" />
-                <PropertyColumn Property="x => x.Title" Title="" HeaderStyle="width:50px">
+                <PropertyColumn Property="x => x.Title" Title="Select" HeaderStyle="width:50px">
                     <CellTemplate>
                         <MudIconButton Icon="@Icons.Material.Filled.SubdirectoryArrowRight"
                                        aria-label="select"
@@ -46,7 +55,7 @@
                                        Color="Color.Primary" />
                     </CellTemplate>
                 </PropertyColumn>
-                <PropertyColumn Property="x => x.IsDeleted" Title="" HeaderStyle="width:50px" >
+                <PropertyColumn Property="x => x.IsDeleted" Title="Delete" HeaderStyle="width:50px" >
                     <CellTemplate>
                         <MudIconButton Icon="@Icons.Material.Outlined.Delete" 
                                        aria-label="delete" 
@@ -79,7 +88,6 @@
                     AdornmentIcon="@Icons.Material.Filled.ArrowForward"
                     OnAdornmentClick="PostMessageToChat"
                     AdornmentAriaLabel="Send Prompt" />
-
             </MudItem>
         </MudGrid>
     </MudItem>
@@ -87,12 +95,19 @@
 </MudGrid>
 
 @code {
-    public string Prompt { get; set; } = string.Empty;
+    private static readonly TimeSpan RefreshInterval = TimeSpan.FromSeconds(10);
+    private readonly CancellationTokenSource _refreshCancellation = new();
+    private Task? _refreshTask;
+
     private const InputType TextInput = InputType.Text;
+    private IEnumerable<ChatModel> _chats = [];
+    private IEnumerable<string> _messages = [];
     private ChatModel? selectedChat = null;
 
-    public IEnumerable<string> _messages = [];
-    private IEnumerable<ChatModel> _chats = [];
+    /// <summary>
+    /// User entered prompt to send to AI assistant.
+    /// </summary>
+    public string Prompt { get; set; } = string.Empty;
 
     /// <inheritdoc/>
     protected override async Task OnInitializedAsync()
@@ -100,6 +115,63 @@
         await ReloadDataAsync();
     }
 
+    /// <inheritdoc/>
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _refreshTask = RefreshDataPeriodicallyAsync(_refreshCancellation.Token);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Disposes of the resources used by the component.
+    /// </summary>
+    public async ValueTask DisposeAsync()
+    {
+        _refreshCancellation.Cancel();
+
+        if (_refreshTask is not null)
+        {
+            await _refreshTask;
+        }
+
+        _refreshCancellation.Dispose();
+    }
+
+    /// <summary>
+    /// Refreshes the data in the tables periodically.
+    /// </summary>
+    private async Task RefreshDataPeriodicallyAsync(CancellationToken cancellationToken)
+    {
+        // Refresh the data every X seconds until the component is disposed.
+        using PeriodicTimer timer = new(RefreshInterval);
+
+        try
+        {
+            // Keep refreshing until the component is disposed.
+            while (await timer.WaitForNextTickAsync(cancellationToken))
+            {
+                // Refresh the data in the tables.
+                await InvokeAsync(async () =>
+                {
+                    // Reloading the data and letting the UI know that the data has changed.
+                    await ReloadDataAsync();
+                    StateHasChanged();
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning(ex, "Data refresh was canceled.");
+        }
+    }
+
+    /// <summary>
+    /// Reloads the data in tables from the API.
+    /// </summary>
     private async Task ReloadDataAsync()
     {
         // Getting all of the chats.
@@ -132,6 +204,9 @@
             .Select(content => content.Message ?? string.Empty);
     }
 
+    /// <summary>
+    /// Callback for chat deletion button.
+    /// </summary>
     private async Task DeleteChat(int id)
     {
         // TODO: Handle gracefully it deleted chat is selected chat.
@@ -139,6 +214,9 @@
         await ReloadDataAsync();
     }
 
+    /// <summary>
+    /// Callback for Chat selection button.
+    /// </summary>
     private async Task SelectChat(int id)
     {
         // Getting the target chat.
@@ -161,6 +239,9 @@
         await ReloadDataAsync();
     }
 
+    /// <summary>
+    /// Will post a message to a selected chat or create a new chat if none is selected.
+    /// </summary>
     private async Task PostMessageToChat()
     {
         if (selectedChat is null)
@@ -229,6 +310,10 @@
         }
     }
 
+    /// <summary>
+    /// Callback for creating a new chat.
+    /// Really just deselects all chats and clears the message list.
+    /// </summary>
     private async Task CreateNewChat()
     {
         selectedChat = null;
@@ -240,6 +325,39 @@
         }
     }
 
+    /// <summary>
+    /// Callback for Archive button to view deleted chats.
+    /// </summary>
+    private async Task ViewArchive()
+    {
+        ICollection<ChatInfoDto> chatData = await Client.Chat.GetAiChatsAsync();
+        List<ChatModel> deletedChats = chatData
+            .Where(chat => chat.IsDeleted == true)
+            .Select(chat => ToViewModel(chat))
+            .ToList();
+
+        DialogOptions options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            CloseButton = true
+        };
+
+        DialogParameters parameters = new()
+        {
+            { "Chats", deletedChats }
+        };
+
+        IDialogReference dialog = await DialogService.ShowAsync<ArchiveDialog>(
+            "Chat Archive", 
+            parameters, 
+            options);
+
+        DialogResult? result = await dialog.Result;
+    }
+
+    /// <summary>
+    /// Converts dtos to view models.
+    /// </summary>
     public ChatModel ToViewModel(ChatInfoDto dto)
     {
         return new ChatModel(
