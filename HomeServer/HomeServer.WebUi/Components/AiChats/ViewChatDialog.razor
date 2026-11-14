@@ -1,8 +1,9 @@
 ﻿<MudDialog>
     <DialogContent>
-        <MudTable T="string" Items="@Messages" Hover="true" Breakpoint="Breakpoint.Sm">
+        <MudTable T="MessageModel" Items="@Messages" Hover="true" Breakpoint="Breakpoint.Sm">
             <RowTemplate>
-                <MudTd DataLabel="Messages">@context</MudTd>
+                <MudTd Style="@(context.UserRole == 1 ? "text-align: right;" : "text-align: left;")"
+                       DataLabel="Messages">@context.Message</MudTd>
             </RowTemplate>
         </MudTable>
     </DialogContent>
@@ -12,5 +13,5 @@
     [CascadingParameter]
     private IMudDialogInstance? MudDialog { get; set; }
     [Parameter]
-    public List<string> Messages { get; set; } = [];
+    public List<MessageModel> Messages { get; set; } = [];
 }

@@ -43,9 +43,9 @@
             Logger.LogWarning("Could not find/select chat with ID: {id}", id);
         }
 
-        List<string> messages = chat?.Messages?
+        List<MessageModel> messages = chat?.Messages?
             .Where(content => content.UserRole != 0)
-            .Select(content => content.Message ?? string.Empty)
+            .Select(content => MessageModel.ToViewModel(content))
             .ToList() ?? [];
 
         DialogOptions options = new DialogOptions 

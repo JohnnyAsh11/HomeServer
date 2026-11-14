@@ -12,7 +12,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Compose-Down.ps1 = Compose-Down.ps1
 		Compose-Up.ps1 = Compose-Up.ps1
 		docker-compose.yml = docker-compose.yml
-		HomeServer.App\HomeServer.App.csproj = HomeServer.App\HomeServer.App.csproj
 		RegenerateDocs.ps1 = RegenerateDocs.ps1
 		RegenerateEndpoints.ps1 = RegenerateEndpoints.ps1
 	EndProjectSection

@@ -71,9 +71,10 @@
         <MudGrid>
             @* The chat view area. *@
             <MudItem xs="12">
-                <MudTable T="string" Items="@_messages" Hover="true" Breakpoint="Breakpoint.Sm">
+                <MudTable T="MessageModel" Items="@_messages" Hover="true" Breakpoint="Breakpoint.Sm">
                     <RowTemplate>
-                        <MudTd DataLabel="Messages">@context</MudTd>
+                        <MudTd Style="@(context.UserRole == 1 ? "text-align: right;" : "text-align: left;")"
+                               DataLabel="Messages">@context.Message</MudTd>
                     </RowTemplate>
                 </MudTable>
             </MudItem>
@@ -101,7 +102,7 @@
 
     private const InputType TextInput = InputType.Text;
     private IEnumerable<ChatModel> _chats = [];
-    private IEnumerable<string> _messages = [];
+    private IEnumerable<MessageModel> _messages = [];
     private ChatModel? selectedChat = null;
 
     /// <summary>
@@ -179,7 +180,7 @@
 
         // Converting them to the view model & ensuring no deleted chats are displayed.
         _chats = chatData
-            .Select(chat => ToViewModel(chat))
+            .Select(chat => ChatModel.ToViewModel(chat))
             .Where(chat => !chat.IsDeleted);
 
         // Maintain the same selected chat.
@@ -201,7 +202,7 @@
 
         _messages = chatContent.Messages
             .Where(content => content.UserRole != 0)
-            .Select(content => content.Message ?? string.Empty);
+            .Select(content => MessageModel.ToViewModel(content));
     }
 
     /// <summary>
@@ -333,7 +334,7 @@
         ICollection<ChatInfoDto> chatData = await Client.Chat.GetAiChatsAsync();
         List<ChatModel> deletedChats = chatData
             .Where(chat => chat.IsDeleted == true)
-            .Select(chat => ToViewModel(chat))
+            .Select(chat => ChatModel.ToViewModel(chat))
             .ToList();
 
         DialogOptions options = new DialogOptions
@@ -353,17 +354,5 @@
             options);
 
         DialogResult? result = await dialog.Result;
-    }
-
-    /// <summary>
-    /// Converts dtos to view models.
-    /// </summary>
-    public ChatModel ToViewModel(ChatInfoDto dto)
-    {
-        return new ChatModel(
-            dto.Id ?? 0,
-            dto.Title ?? string.Empty,
-            dto.IsDeleted ?? true,
-            false);
     }
 }
