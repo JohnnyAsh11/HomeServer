@@ -1,0 +1,137 @@
+﻿@page "/Minecraft"
+@inject HomeServerClient Client;
+@inject ISnackbar Snackbar;
+@inject ILogger<MinecraftDashboard> Logger;
+
+<PageTitle>Minecraft Dashboard</PageTitle>
+
+
+<MudGrid>
+
+    <MudItem xs="6">
+        <MudPaper Class="pa-4 d-flex justify-center">
+            @* Setting the time to day. *@
+            <MudButton style="margin: 30px;"
+                       Class="pa-4"
+                       StartIcon="@Icons.Material.Filled.WbSunny"
+                       Variant="Variant.Outlined"
+                       aria-label="select"
+                       OnClick="() => RunCommand(SetTimeToDayCommand)"
+                       Color="Color.Info">
+                Set Time to Day
+            </MudButton>
+            
+            @* Clearing the weather. *@
+            <MudButton style="margin: 30px;"
+                       Class="pa-4"
+                       StartIcon="@Icons.Material.Filled.Thunderstorm"
+                       Variant="Variant.Outlined"
+                       aria-label="select"
+                       OnClick="() => RunCommand(SetWeatherClearCommand)"
+                       Color="Color.Tertiary">
+                Set Weather to Clear
+            </MudButton>
+        </MudPaper>
+    </MudItem>
+
+    <MudItem xs="6">
+        <MudPaper Class="pa-4 d-flex justify-center">
+            @* Peaceful *@
+            <MudButton style="margin: 30px;"
+                       Class="pa-4"
+                       StartIcon="@Icons.Material.Filled.SentimentVerySatisfied"
+                       Variant="Variant.Outlined"
+                       aria-label="select"
+                       OnClick="() => RunCommand(SetDifficultyPeaceful)"
+                       Color="Color.Primary">
+                Set Difficulty to Peaceful
+            </MudButton>
+
+            @* Peaceful *@
+            <MudButton style="margin: 30px;"
+                       Class="pa-4"
+                       StartIcon="@Icons.Material.Filled.SentimentSatisfiedAlt"
+                       Variant="Variant.Outlined"
+                       aria-label="select"
+                       OnClick="() => RunCommand(SetDifficultyEasy)"
+                       Color="Color.Success">
+                Set Difficulty to Easy
+            </MudButton>
+
+            @* Normal *@
+            <MudButton style="margin: 30px;"
+                       Class="pa-4"
+                       StartIcon="@Icons.Material.Filled.SentimentNeutral"
+                       Variant="Variant.Outlined"
+                       aria-label="select"
+                       OnClick="() => RunCommand(SetDifficultyNormal)"
+                       Color="Color.Warning">
+                Set Difficulty to Normal
+            </MudButton>
+
+            @* Hard *@
+            <MudButton style="margin: 30px;"
+                       Class="pa-4"
+                       StartIcon="@Icons.Material.Filled.SentimentVeryDissatisfied"
+                       Variant="Variant.Outlined"
+                       aria-label="select"
+                       OnClick="() => RunCommand(SetDifficultyHard)"
+                       Color="Color.Error">
+                Set Difficulty to Hard
+            </MudButton>
+        </MudPaper>
+    </MudItem>
+
+    <MudItem xs="12">
+        <MudTextField @bind-Value="Command"
+                    Label="Custom Command Entry"
+                    Variant="Variant.Outlined"
+                    InputType="@TextInput"
+                    Adornment="Adornment.End"
+                    AdornmentIcon="@Icons.Material.Filled.ArrowForward"
+                    OnAdornmentClick="async () => { await RunCommand(Command); Command = string.Empty; }"
+                    AdornmentAriaLabel="Send Prompt" />
+    </MudItem>
+
+</MudGrid>
+
+@code {
+    private const string SetTimeToDayCommand = "time set day";
+    private const string SetWeatherClearCommand = "weather clear";
+
+    private const string SetDifficultyPeaceful = "difficulty peaceful";
+    private const string SetDifficultyEasy = "difficulty easy";
+    private const string SetDifficultyNormal = "difficulty normal";
+    private const string SetDifficultyHard = "difficulty hard";
+    
+    private const InputType TextInput = InputType.Text;
+    private string Command { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Runs the passed in command in the Minecraft server.
+    /// </summary>
+    public async Task RunCommand(string command)
+    {
+        MinecraftCommandDto commandBody = new()
+        {
+            Command = command
+        };
+        MinecraftCommandDto chatBody = new()
+        {
+            Command = $"say Executing the following command: {command}"
+        };
+
+        // Posting the command being run to the server chat.
+        await Client.Minecraft.PostMinecraftCommandAsync(chatBody);
+
+        // Posting the commands to the minecraft server.
+        MinecraftResponseDto response = await Client.Minecraft.PostMinecraftCommandAsync(commandBody);
+
+        // Outputting the response to the snackbar
+        if (response.Response is not null)
+        {
+            Snackbar.Add(response.Response, Severity.Info);
+        }
+    }
+
+}
