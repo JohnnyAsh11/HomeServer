@@ -99,8 +99,14 @@ namespace HomeServer.Api
             services.AddHealthChecks();
 
             // Semantic Kernel Setup.
+            string? aiModel = context.Configuration["OllamaAiModel"];
+            if (aiModel is null)
+            { 
+                throw new Exception("Ollama AI model is not configured.");
+            }
+
             IKernelBuilder kernel = services.AddKernel();
-            services.AddOllamaChatCompletion("gemma3", new Uri("http://homeserver-ai:11434"));
+            services.AddOllamaChatCompletion(aiModel, new Uri("http://homeserver-ai:11434"));
 
             // Swagger
             // services.AddSwaggerGen();

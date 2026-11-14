@@ -7,6 +7,9 @@ using System.Text.Json.Serialization;
 
 namespace HomeServer.Api
 {
+    /// <summary>
+    /// Dictates the structured output format for the AI's response in a chat.
+    /// </summary>
     internal sealed record TitleOutput([property: JsonPropertyName("title")] string Title);
 
     /// <summary>
