@@ -108,6 +108,8 @@ services:
       EULA: "TRUE"
       VERSION: "1.20.2"
       MEMORY: "2G"
+      ENABLE_RCON: "true"
+      RCON_PASSWORD: "admin"
     volumes:
       - "./HomeServer.Data/MinecraftData:/data"
 

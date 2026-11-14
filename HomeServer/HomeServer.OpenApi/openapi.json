@@ -400,6 +400,46 @@
           }
         }
       }
+    },
+    "/minecraft": {
+      "post": {
+        "tags": [
+          "Minecraft"
+        ],
+        "description": "Posts a command to the Minecraft server.",
+        "operationId": "PostMinecraftCommand",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MinecraftCommandDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MinecraftResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -416,6 +456,32 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "MinecraftCommandDto": {
+        "type": "object",
+        "description": "Request to send a command to the Minecraft server.",
+        "additionalProperties": false,
+        "required": [
+          "command"
+        ],
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "The command to send to the Minecraft server."
+          }
+        }
+      },
+      "MinecraftResponseDto": {
+        "type": "object",
+        "description": "Response to a Minecraft command.",
+        "additionalProperties": false,
+        "properties": {
+          "response": {
+            "type": "string",
+            "description": "The response from the Minecraft server.",
+            "nullable": true
           }
         }
       },

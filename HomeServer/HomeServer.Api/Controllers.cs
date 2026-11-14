@@ -258,6 +258,44 @@ namespace HomeServer.Api
 
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public interface IMinecraftController
+    {
+
+        /// <remarks>
+        /// Posts a command to the Minecraft server.
+        /// </remarks>
+
+        /// <returns>OK</returns>
+
+        System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.ActionResult<MinecraftResponseDto>> PostMinecraftCommandAsync(MinecraftCommandDto? body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+
+    public partial class MinecraftController : Microsoft.AspNetCore.Mvc.ControllerBase
+    {
+        private IMinecraftController _implementation;
+
+        public MinecraftController(IMinecraftController implementation)
+        {
+            _implementation = implementation;
+        }
+
+        /// <remarks>
+        /// Posts a command to the Minecraft server.
+        /// </remarks>
+        /// <returns>OK</returns>
+        [Microsoft.AspNetCore.Mvc.HttpPost, Microsoft.AspNetCore.Mvc.Route("minecraft")]
+        public System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.ActionResult<MinecraftResponseDto>> PostMinecraftCommand([Microsoft.AspNetCore.Mvc.FromBody] MinecraftCommandDto? body, System.Threading.CancellationToken cancellationToken)
+        {
+
+            return _implementation.PostMinecraftCommandAsync(body, cancellationToken);
+        }
+
+    }
+
     /// <summary>
     /// Error response to a given request.
     /// </summary>
@@ -270,6 +308,37 @@ namespace HomeServer.Api
 
         [System.Text.Json.Serialization.JsonPropertyName("message")]
         public System.Collections.Generic.List<string>? Message { get; set; } = default!;
+
+    }
+
+    /// <summary>
+    /// Request to send a command to the Minecraft server.
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class MinecraftCommandDto
+    {
+        /// <summary>
+        /// The command to send to the Minecraft server.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("command")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string Command { get; set; } = default!;
+
+    }
+
+    /// <summary>
+    /// Response to a Minecraft command.
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class MinecraftResponseDto
+    {
+        /// <summary>
+        /// The response from the Minecraft server.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("response")]
+        public string? Response { get; set; } = default!;
 
     }
 

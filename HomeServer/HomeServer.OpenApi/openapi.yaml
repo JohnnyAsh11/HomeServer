@@ -270,6 +270,32 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorDto"
 
+  /minecraft:
+    # MARK: Post Minecraft command
+    post:
+      tags:
+        - Minecraft
+      operationId: PostMinecraftCommand
+      description: Posts a command to the Minecraft server.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MinecraftCommandDto"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MinecraftResponseDto"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+
 components:
   schemas:
     # MARK: Error Dto
@@ -284,6 +310,29 @@ components:
           nullable: true
           items:
             type: string
+
+    # MARK: Minecraft Command Request Dto:
+    MinecraftCommandDto:
+      type: object
+      description: Request to send a command to the Minecraft server.
+      additionalProperties: false
+      required:
+        - command
+      properties:
+        command:
+          type: string
+          description: The command to send to the Minecraft server.
+
+    # MARK: Minecraft Command Response Dto:
+    MinecraftResponseDto:
+      type: object
+      description: Response to a Minecraft command.
+      additionalProperties: false
+      properties:
+        response:
+          type: string
+          description: The response from the Minecraft server.
+          nullable: true
 
     # MARK: Chat Info Dto
     ChatInfoDto:

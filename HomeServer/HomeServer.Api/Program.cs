@@ -68,10 +68,12 @@ namespace HomeServer.Api
             services.AddDbContext<HomeServerContext>();
             services.AddSingleton<AiClientService>();
             services.AddSingleton<HangfireManager>();
+            services.AddScoped<MinecraftService>();
 
             // API Endpoint Controllers:
             services.AddScoped<ITaskController, TodoController>();
             services.AddScoped<IChatController, AiChatController>();
+            services.AddScoped<IMinecraftController, Controllers.MinecraftController>();
 
             // Hangfire configuration:
             services.AddHangfire(configuration => configuration
