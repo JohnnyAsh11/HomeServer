@@ -1,0 +1,1 @@
+docker exec homeserver-homeserver-minecraft-1 rcon-cli gamemode creative PanSearedWaffle
