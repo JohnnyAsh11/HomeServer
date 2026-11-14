@@ -1,0 +1,67 @@
+﻿@inject HomeServerClient Client;
+@inject ILogger<AiAssistant> Logger;
+@inject IDialogService DialogService;
+
+<MudDialog>
+    <DialogContent>
+        <MudDataGrid T="ChatModel" Items="Chats" Loading="false">
+            <Columns>
+                <PropertyColumn Property="x => x.Id" Title="Id" HeaderStyle="width:25px" />
+                <PropertyColumn Property="x => x.Title" Title="Title" HeaderStyle="width:200px" />
+                <PropertyColumn Property="x => x.Title" Title="Select" HeaderStyle="width:50px">
+                    <CellTemplate>
+                        <MudIconButton Icon="@Icons.Material.Filled.ArrowOutward"
+                                       aria-label="select"
+                                       OnClick="() => SelectChat(context.Item.Id)"
+                                       Disabled="context.Item.IsSelected"
+                                       Color="Color.Primary" />
+                    </CellTemplate>
+                </PropertyColumn>
+            </Columns>
+            <PagerContent>
+                <MudDataGridPager T="ChatModel" />
+            </PagerContent>
+        </MudDataGrid>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance? MudDialog { get; set; }
+    [Parameter]
+    public List<ChatModel> Chats { get; set; } = [];
+
+    /// <summary>
+    /// Callback for Chat selection button.
+    /// </summary>
+    private async Task SelectChat(int id)
+    {
+        ChatContentDto chat = await Client.Chat.GetAiChatByIdAsync(id);
+
+        if (chat is null)
+        {
+            Logger.LogWarning("Could not find/select chat with ID: {id}", id);
+        }
+
+        List<string> messages = chat?.Messages?
+            .Where(content => content.UserRole != 0)
+            .Select(content => content.Message ?? string.Empty)
+            .ToList() ?? [];
+
+        DialogOptions options = new DialogOptions 
+        { 
+            CloseOnEscapeKey = true, 
+            CloseButton = true 
+        };
+        DialogParameters parameters = new()
+        {
+            { "Messages", messages }
+        };
+
+        IDialogReference dialog = await DialogService.ShowAsync<ViewChatDialog>(
+            chat?.Title ?? "Untitled Chat", 
+            parameters, 
+            options);
+    }
+
+}

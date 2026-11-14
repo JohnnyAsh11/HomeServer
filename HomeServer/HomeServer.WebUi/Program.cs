@@ -27,7 +27,7 @@ public class Program
         // Adding the Client to the services collection.
         string? apiUrl = builder.Configuration["ApiUrl"];
         builder.Services.AddSingleton(
-            services => new TodoListClient(
+            services => new HomeServerClient(
                 services.GetRequiredService<HttpClient>(),
                 apiUrl ?? throw new ArgumentException($"The API URL was not provided.")
             ));

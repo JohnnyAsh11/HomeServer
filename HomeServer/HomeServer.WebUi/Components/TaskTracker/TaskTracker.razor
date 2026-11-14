@@ -1,5 +1,5 @@
-﻿@page "/"
-@inject TodoListClient Client;
+﻿@page "/TodoList"
+@inject HomeServerClient Client;
 @inject IDialogService DialogService;
 @inject ISnackbar Snackbar; 
 @inject ILogger<TaskTracker> Logger;
@@ -12,7 +12,7 @@
         <MudText
             style="margin: 30px; font-size: 2rem;"
             Class="pa-4">
-            Johnny's Task Tracker
+            Task Tracker
         </MudText>
     </MudItem>
 

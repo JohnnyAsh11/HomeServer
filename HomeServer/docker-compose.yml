@@ -1,4 +1,5 @@
 services:
+  # MARK: PROXY
   traefik:
     image: traefik:v3.5
     networks:
@@ -47,12 +48,13 @@ services:
       - "5050:8080"
     build:
       context: .
-      dockerfile: ./HomeServer.TodoList/Dockerfile
+      dockerfile: ./HomeServer.Api/Dockerfile
       args:
         configuration: Debug
     volumes:
-      - "./HomeServer.Data/TodoDatabase:/data"
+      - "./HomeServer.Data/HomeServerDatabase:/data"
 
+  # MARK: WEB UI
   homeserver-webui:
     image: homeserver-webui
     networks:
@@ -75,6 +77,26 @@ services:
         configuration: Debug
     environment:
       ASPNETCORE_URLS: "http://+:80"
+
+  # MARK: FINANCE TOOL
+  homeserver-finances:
+    image: actualbudget/actual-server
+    networks:
+      - homeserver-network
+    ports:
+      - "5006:5006"
+    volumes:
+      - "./HomeServer.Data/ActualBudgetData:/data"
+
+  # MARK: AI OLLAMA
+  homeserver-ai:
+    networks:
+      - homeserver-network
+    image: ollama/ollama
+    ports: 
+      - "11434:11434"
+    volumes: 
+      - "${USERPROFILE}/.ollama:/root/.ollama"
 
 networks:
   homeserver-network:

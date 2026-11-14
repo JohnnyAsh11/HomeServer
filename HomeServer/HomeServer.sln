@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.7.11925.98
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeServer.TodoList", "HomeServer.TodoList\HomeServer.TodoList.csproj", "{67476EBD-8A31-4684-B23A-1776CF9B0734}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeServer.Api", "HomeServer.Api\HomeServer.Api.csproj", "{67476EBD-8A31-4684-B23A-1776CF9B0734}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeServer.Services", "HomeServer.Services\HomeServer.Services.csproj", "{01BE5CFF-7EC3-4855-8D89-1AFE17BC65EF}"
 EndProject
@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Compose-Up.ps1 = Compose-Up.ps1
 		docker-compose.yml = docker-compose.yml
 		HomeServer.App\HomeServer.App.csproj = HomeServer.App\HomeServer.App.csproj
+		RegenerateDocs.ps1 = RegenerateDocs.ps1
+		RegenerateEndpoints.ps1 = RegenerateEndpoints.ps1
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeServer.OpenApi", "HomeServer.OpenApi\HomeServer.OpenApi.csproj", "{177C79D0-8A64-4F8E-A564-20A4819EAC8C}"

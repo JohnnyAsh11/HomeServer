@@ -1,0 +1,16 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudTable T="string" Items="@Messages" Hover="true" Breakpoint="Breakpoint.Sm">
+            <RowTemplate>
+                <MudTd DataLabel="Messages">@context</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance? MudDialog { get; set; }
+    [Parameter]
+    public List<string> Messages { get; set; } = [];
+}
