@@ -1,7 +1,7 @@
 services:
   # MARK: PROXY
   traefik:
-    image: traefik:v3.5
+    image: traefik:v3.6.16
     networks:
       - homeserver-network
     command:
@@ -11,10 +11,6 @@ services:
       - "--entrypoints.web.address=:80"
       - "--providers.docker.useBindPortIP=true"
       - "--log.level=DEBUG"
-      
-      - "traefik.http.middlewares.secure-headers.headers.sslredirect=true"
-      - "traefik.http.middlewares.secure-headers.headers.browserxssfilter=true"
-      - "traefik.http.middlewares.secure-headers.headers.contenttypenosniff=true"
     ports:
       - "80:80"
       - "443:443"
@@ -96,8 +92,10 @@ services:
     ports: 
       - "11434:11434"
     volumes: 
+      # - "/home/johnny/.ollama:/root/.ollama"
       - "${USERPROFILE}/.ollama:/root/.ollama"
 
+  # MARK: MINECRAFT
   homeserver-minecraft:
     image: itzg/minecraft-server
     networks:
