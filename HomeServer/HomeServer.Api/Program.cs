@@ -67,7 +67,7 @@ namespace HomeServer.Api
             services.AddControllers();
             services.AddDbContext<HomeServerContext>();
             services.AddSingleton<AiClientService>();
-            services.AddSingleton<HangfireManager>();
+            services.AddScoped<HangfireManager>();
             services.AddScoped<MinecraftService>();
 
             // API Endpoint Controllers:
